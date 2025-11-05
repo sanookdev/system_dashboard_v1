@@ -1,0 +1,123 @@
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import LoginView from "@/views/LoginView.vue";
+import AdminDashboardView from "@/views/admin/DashboardView.vue";
+import PermissionView from "@/views/admin/PermissionView.vue";
+import AdminCategory from "@/views/admin/CategoryView.vue";
+import AdminSystems from "@/views/admin/SystemsView.vue";
+import UserDashboard from "@/views/user/DashboardView.vue";
+// ✅ import store
+import { useAccountStore } from "@/stores/account";
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: "/superadmin/dashboard",
+      name: "superadmin-dashboard",
+      component: AdminDashboardView,
+      meta: { title: "ภาพรวมระบบ", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
+      path: "/superadmin/permission",
+      name: "superadmin-permission",
+      component: PermissionView,
+      meta: { title: "สิทธิ์การใช้งาน", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
+      path: "/superadmin/systems",
+      name: "superadmin-systems",
+      component: AdminSystems,
+      meta: { title: "ระบบงาน", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
+      path: "/superadmin/category",
+      name: "superadmin-category",
+      component: AdminCategory,
+      meta: { title: "หมวดหมู่", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
+      path: "/dashboard",
+      name: "user-dashboard",
+      component: UserDashboard,
+      meta: { title: "User-Dashboard", requiresAuth: true, role: 'user' }
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: LoginView,
+      meta: { title: "เข้าสู่ระบบ" },
+    },
+    {
+      path: "/",
+      name: "",
+      component: LoginView,
+      meta: { title: "เข้าสู่ระบบ" },
+    },
+  ],
+});
+// ✅ map หน้า home ของแต่ละ role
+const roleHome = (role) => {
+  if (role === "admin") return { name: "superadmin-dashboard" };
+  if (role === "user") return { name: "user-dashboard" };
+  return { name: "login" };
+};
+
+router.beforeEach((to, from, next) => {
+  const accountStore = useAccountStore();
+
+  const isLoggedIn = accountStore.isLoggedIn;     // ใช้ state ที่มีอยู่แล้ว
+  const userRole = accountStore.user?.role || ""; // ปรับให้ตรงกับ field จริง
+
+  // ตั้ง title
+  if (to.meta?.title) {
+    document.title = to.meta.title;
+  }
+
+  // ---------- กรณียังไม่ล็อกอิน ----------
+  if (!isLoggedIn) {
+    // ถ้า route นี้ต้อง login แต่ยังไม่ login → เด้งไป login
+    if (to.meta.requiresAuth) {
+      // กันลูป: ถ้าเดิมทีก็จะไป login อยู่แล้ว ไม่ต้อง redirect ซ้ำ
+      if (to.name !== "login") {
+        return next({ name: "login" });
+      }
+      return next();
+    }
+
+    // ถ้าเป็น public route (login, root) → ปล่อยผ่าน
+    return next();
+  }
+  // ---------- ล็อกอินแล้ว ----------
+  if (to.name === "login" || to.name === "root") {
+    const target = getHomeByRole(userRole);
+    if (to.name !== target.name) return next(target);
+    return next();
+  }
+
+  // ---------- ตรวจ role ----------
+  if (to.meta.role) {
+    const allowedRoles = Array.isArray(to.meta.role)
+      ? to.meta.role
+      : [to.meta.role]; // แปลงเป็น array เสมอ
+
+    // ถ้า userRole ไม่อยู่ใน allowedRoles → redirect ไปหน้า home ตัวเอง
+    if (!allowedRoles.includes(userRole)) {
+      const target = getHomeByRole(userRole);
+      if (to.name !== target.name) return next(target);
+    }
+  }
+
+  // ผ่านทุกเงื่อนไขแล้ว ไปต่อปกติ
+  next();
+});
+// ✅ ฟังก์ชันคืนค่าหน้า home ตาม role
+function getHomeByRole(role) {
+  if (role === "admin" || role === "superadmin") {
+    return { name: "superadmin-dashboard" };
+  }
+  if (role === "user") {
+    return { name: "user-dashboard" };
+  }
+  return { name: "login" };
+}
+export default router;

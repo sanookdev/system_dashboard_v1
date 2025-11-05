@@ -1,0 +1,30 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd Backend && nodemon .\" \"cd Frontend && npm run dev\"",
+    "start:frontend": "cd Frontend && npm run dev",
+    "start:backend": "cd Backend && nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanookdev/system_dashboard_medtu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sanookdev/system_dashboard_medtu/issues"
+  },
+  "homepage": "https://github.com/sanookdev/system_dashboard_medtu#readme",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.3"
+  }
+}
