@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       created_by: { type: DataTypes.STRING },
       updated_at: { type: DataTypes.DATE, allowNull: true },
       updated_by: { type: DataTypes.STRING },
+      public: { type: DataTypes.INTEGER }
     },
     {
       tableName: "system_categories",

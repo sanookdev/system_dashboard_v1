@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import api from "@/utils/api"; // Axios instance พร้อม interceptor
+
 import baseApiUrl from "@/stores/config/axiosConfig";
 
 export const useAccountStore = defineStore("account", {
@@ -119,5 +121,27 @@ export const useAccountStore = defineStore("account", {
       await localStorage.removeItem("permissionList");
       await localStorage.removeItem("categories");
     },
+
+    async ssoStart(system_id) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_DEVELOPMENT
+        const response = await api.post(`${apiUrl}auth/sso/start`, {
+          system_id: system_id,
+          redirect_uri: `${apiUrl}auth/introspect`
+        })
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async authorize_system(redirect_auth, system_id) {
+      try {
+        const response = await api.post(redirect_auth, { system_id: system_id })
+        console.log('authorizeResponse store', response)
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
+    }
   },
 });

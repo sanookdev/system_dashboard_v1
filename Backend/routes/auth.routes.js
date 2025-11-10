@@ -82,58 +82,7 @@ router.post(
    ใช้ตรวจสิทธิ์เบื้องต้นจาก Dashboard: เช็ค isAdmin/roles ของผู้ใช้สำหรับ system_id
    หมายเหตุ: ต้องแนบ Authorization: Bearer <access_token> มาด้วย
 ------------------------------------------------ */
-router.post(
-  "/introspect",
-  verifyApplicationKey,
-  verifyToken, // => ใส่ payload ลง req.user แล้ว
-  [
-    check("system_id").notEmpty().withMessage("system_id is required"),
-    // ถ้าต้องการให้เป็นตัวเลข strict: .isInt().withMessage("system_id must be an integer")
-  ],
-  async (req, res) => {
-    const checkErr = validationResult(req);
-    if (!checkErr.isEmpty()) {
-      return badRequest(res, "Validation error", { error: checkErr.errors });
-    }
 
-    try {
-      if (!req.body) {
-        return badRequest(res, "Missing body");
-      }
-
-      const { system_id } = req.body || {};
-      const user = req.user; // มาจาก verifyToken แล้ว เช่น { sub, username, isAdmin, roles, exp, ... }
-
-      if (!user) {
-        return unauthorized(res, "invalid or missing token");
-      }
-
-      // ตรวจสิทธิ์ในระบบย่อยจากศูนย์กลาง
-      const verify = await authController.verifySystem(user.username, system_id);
-
-      // สมมติ verify คืน { status:boolean, roles?:[], perms?:[], isAdmin?:boolean, message?:string }
-      if (!verify?.status) {
-        return forbidden(res, verify?.message || "No permission for this system");
-      }
-
-      return res.status(200).json({
-        status: true,
-        user: {
-          id: user.sub,
-          username: user.username,
-          isAdmin: !!verify.isAdmin, // หรือจะ fallback เป็น !!user.isAdmin ก็ได้หากมีใน token
-        },
-        system_id,
-        roles: verify.roles || [],
-        perms: verify.perms || [],
-        // ส่ง exp ของ token ปัจจุบันกลับไปเผื่อระบบย่อย cache ตามอายุ token
-        exp: user.exp,
-      });
-    } catch (error) {
-      return serverError(res, error);
-    }
-  }
-);
 router.get(
   "/authenticate",
   verifyApplicationKey,
@@ -228,16 +177,68 @@ router.post("/sso/start", verifyApplicationKey, verifyToken, async (req, res) =>
       exp: Date.now() + 60_000, // 60s
       state
     }, 60);
-
     const url = new URL(redirect_uri);
     url.searchParams.set("code", code);
     url.searchParams.set("state", state);
-    return res.status(200).json({ redirect: url.toString(), query: `?code=${code}&state=${state}` });
+    return res.status(200).json({ status: true, redirect: url.toString(), query: `?code=${code}&state=${state}` });
   } catch (error) {
     return res.status(500).json({ status: false, message: "เกิดข้อผิดพลาด /sso/start", error: error.message })
   }
 
-})
+});
+
+router.post(
+  "/introspect",
+  verifyApplicationKey,
+  verifyToken, // => ใส่ payload ลง req.user แล้ว
+  [
+    check("system_id").notEmpty().withMessage("system_id is required"),
+    // ถ้าต้องการให้เป็นตัวเลข strict: .isInt().withMessage("system_id must be an integer")
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return badRequest(res, "Validation error", { error: checkErr.errors });
+    }
+
+    try {
+      if (!req.body) {
+        return badRequest(res, "Missing body");
+      }
+
+      const { system_id } = req.body || {};
+      const user = req.user; // มาจาก verifyToken แล้ว เช่น { sub, username, isAdmin, roles, exp, ... }
+
+      if (!user) {
+        return unauthorized(res, "invalid or missing token");
+      }
+
+      // ตรวจสิทธิ์ในระบบย่อยจากศูนย์กลาง
+      const verify = await authController.verifySystem(user.username, system_id);
+
+      // สมมติ verify คืน { status:boolean, roles?:[], perms?:[], isAdmin?:boolean, message?:string }
+      if (!verify?.status) {
+        return forbidden(res, verify?.message || "No permission for this system");
+      }
+
+      return res.status(200).json({
+        status: true,
+        user: {
+          id: user.sub,
+          username: user.username,
+          isAdmin: !!verify.isAdmin, // หรือจะ fallback เป็น !!user.isAdmin ก็ได้หากมีใน token
+        },
+        system_id,
+        roles: verify.roles || [],
+        perms: verify.perms || [],
+        // ส่ง exp ของ token ปัจจุบันกลับไปเผื่อระบบย่อย cache ตามอายุ token
+        exp: user.exp,
+      });
+    } catch (error) {
+      return serverError(res, error);
+    }
+  }
+);
 
 router.get("/genkey", async (req, res) => {
   try {
