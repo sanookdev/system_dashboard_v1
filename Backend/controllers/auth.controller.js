@@ -1,4 +1,4 @@
-const { User, employeeAuth, SystemPermission, System } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -46,16 +46,32 @@ module.exports = {
           system_id: system_id,
         };
       }
-      const system = await System.findOne({ where: { id: system_id } })
+      const system = await System.findOne({
+        where: { id: system_id }, include: [
+          {
+            model: Category,
+            as: "category",
+          },
+        ],
+      })
       if (!system) return { status: false, message: "System not found." }
 
-      const verify = await SystemPermission.findOne({
-        where: { employee_code: username, system_id },
-      });
+      const plainSystem = system.get({ plain: true })
 
-      const plain = verify?.get({ plain: true });
-      if (plain)
-        return { status: true, message: "Success", ...plain };
+      if (!plainSystem.category.public) {
+        const verify = await SystemPermission.findOne({
+          where: { employee_code: username, system_id },
+        });
+
+        const plain = verify?.get({ plain: true });
+        if (plain)
+          return { status: true, message: "Success", ...plain };
+      }
+
+      if (plainSystem.category.public) {
+        return { status: true, message: "Success", isAdmin: 0 }
+      }
+
       return { status: false, message: "You dont have permission!" };
     } catch (error) {
       return {

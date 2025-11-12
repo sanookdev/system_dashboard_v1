@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
+const userSystemController = require("../controllers/user/systems.controller")
 const adminSystem = ["admin", "superadmin", "system"];
 const cache = require("../utils/cache.js");
 const crypto = require("crypto")
@@ -165,6 +166,29 @@ router.get("/callback", async (req, res) => {
     return res.status(500).send("callback error");
   }
 })
+
+// 1) set
+router.post("/debug/set", async (req, res) => {
+  const { code } = req.body;
+  const cacheKey = `code:${code}`;
+
+  cache.set(cacheKey, { hello: "world" }, 60);
+
+  console.log("SET", cacheKey);
+  return res.json({ status: true, cacheKey });
+});
+
+// 2) get
+router.post("/debug/get", async (req, res) => {
+  const { code } = req.body;
+  const cacheKey = `code:${code}`;
+
+  const data = cache.get(cacheKey);
+
+  console.log("GET", cacheKey, data);
+  if (!data) return res.json({ status: false, message: "Cannot decrypt code." })
+  return res.json({ status: true, cacheKey, data });
+});
 router.post("/sso/start", verifyApplicationKey, verifyToken, async (req, res) => {
   try {
     const { system_id, redirect_uri } = req.body || {}
@@ -192,6 +216,8 @@ router.post(
   verifyApplicationKey,
   verifyToken, // => ใส่ payload ลง req.user แล้ว
   [
+    check("code").notEmpty().withMessage("code is required"),
+    check("state").notEmpty().withMessage("state is required"),
     check("system_id").notEmpty().withMessage("system_id is required"),
     // ถ้าต้องการให้เป็นตัวเลข strict: .isInt().withMessage("system_id must be an integer")
   ],
@@ -205,9 +231,41 @@ router.post(
       if (!req.body) {
         return badRequest(res, "Missing body");
       }
-
       const { system_id } = req.body || {};
-      const user = req.user; // มาจาก verifyToken แล้ว เช่น { sub, username, isAdmin, roles, exp, ... }
+      const { code, state } = req.query || {}
+
+      console.log('code = ' + code)
+      console.log('state = ' + state)
+
+      // 1) ดึงข้อมูลจาก cache ด้วย code
+      const cacheKey = `code:${code}`;
+      const data = await cache.get(cacheKey);
+
+      if (!data) {
+        return unauthorized(res, "invalid or expired code");
+      }
+
+      // 2) ตรวจ state ให้ตรงกัน
+      if (data.state !== state) {
+        // กันกรณีโดนดัก code แล้วเอาไปยิงเอง
+        await cache.del(cacheKey); // ลบทิ้งอยู่ดี กัน reuse
+        return unauthorized(res, "invalid state");
+      }
+      // 3) ตรวจหมดอายุ
+      if (data.exp && data.exp < Date.now()) {
+        await cache.del(cacheKey);
+        return unauthorized(res, "code expired");
+      }
+
+      // 4) ตรวจว่า code นี้ออกให้ system นี้จริงไหม
+      if (String(data.system_id) !== String(system_id)) {
+        return forbidden(res, "code is not issued for this system");
+      }
+
+      // 5) ลบ code ออกจาก cache ให้เป็น one-time
+      await cache.del(cacheKey);
+
+      const user = data.user; // มาจาก verifyToken แล้ว เช่น { sub, username, isAdmin, roles, exp, ... }
 
       if (!user) {
         return unauthorized(res, "invalid or missing token");
