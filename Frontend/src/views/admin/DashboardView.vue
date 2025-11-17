@@ -40,19 +40,18 @@
             <div v-if="!isListView">
               <div
                 v-if="systems.length"
-                class="flex flex-col md:flex-row gap-4"
+                class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
               >
                 <div
                   v-for="system in systems"
                   :key="system.id"
-                  class="flex justify-center items-center gap-2"
+                  class="flex justify-center items-center"
                 >
-                  <div v-if="system">
-                    <SubsystemCard
-                      @click="openSubsystem(system)"
-                      :subsystem="system"
-                    ></SubsystemCard>
-                  </div>
+                  <SubsystemCard
+                    v-if="system"
+                    @click="openSubsystem(system)"
+                    :subsystem="system"
+                  />
                 </div>
               </div>
               <div v-else class="text-center text-gray-400 p-6">
@@ -94,7 +93,7 @@
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 text-white"
     >
       <span class="loading loading-spinner loading-lg mb-4"></span>
-      <p class="text-xl">กำลังนำท่านเข้าสู่ระบบ...</p>
+      <p class="text-xl">{{ redirectLoadingText }}</p>
     </div>
   </div>
 </template>
@@ -112,6 +111,8 @@ import { useCategoriesStore } from "@/stores/superadmin/categories";
 const categoriesStore = useCategoriesStore();
 
 const selectedTabId = ref(null);
+
+const redirectLoadingText = ref("...");
 
 const categories = computed(() => categoriesStore.list);
 
@@ -141,13 +142,48 @@ const toggleListView = () => {
 };
 
 const openSubsystem = async (system) => {
-  console.log("token" + accountStore.token);
-  console.log("url", system.url);
-  redirectLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  const token = encodeURIComponent(accountStore.token);
-  window.open(`${system.url}?token=${token}`, "__blank");
-  redirectLoading.value = false;
+  try {
+    redirectLoading.value = true;
+    redirectLoadingText.value = "กำลังยืนยันตัวตน...";
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const token = encodeURIComponent(accountStore.token);
+    const { id: system_id, url: system_url } = system;
+    const redirect_to_subsystem = `${system_url}?token=${token}`;
+    const ssoResponse = await accountStore.ssoStart(system_id);
+    if (!ssoResponse?.status) {
+      throw new Error(ssoResponse?.message || "เริ่ม SSO ไม่สำเร็จ");
+    } else {
+      console.log("sso pass");
+      redirectLoadingText.value = "กำลังเช็คสิทธิ์การใช้งาน...";
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const authorizeResponse = ssoResponse.status
+      ? await accountStore.authorize_system(ssoResponse.redirect, system_id)
+      : (authorizeResponse.status = false);
+
+    if (!authorizeResponse?.status) {
+      console.log(authorizeResponse);
+      throw new Error(
+        authorizeResponse?.message || "ไม่สามารถยืนยันสิทธิ์เข้าใช้ระบบย่อยได้"
+      );
+    } else {
+      console.log("authorize system pass");
+      redirectLoadingText.value = "กำลังนำท่านเข้าสู่ระบบ...";
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    if (authorizeResponse.status) {
+      window.open(redirect_to_subsystem, "__blank");
+    } else {
+      alert(authorizeResponse.message);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    redirectLoading.value = false;
+  }
 };
 </script>
 

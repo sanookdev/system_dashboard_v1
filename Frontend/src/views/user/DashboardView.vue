@@ -40,19 +40,18 @@
             <div v-if="!isListView">
               <div
                 v-if="systems.length"
-                class="flex flex-col md:flex-row gap-4"
+                class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
               >
                 <div
                   v-for="system in systems"
                   :key="system.id"
-                  class="flex justify-center items-center gap-2"
+                  class="flex justify-center items-center"
                 >
-                  <div v-if="system">
-                    <SubsystemCard
-                      @click="openSubsystem(system)"
-                      :subsystem="system"
-                    ></SubsystemCard>
-                  </div>
+                  <SubsystemCard
+                    v-if="system"
+                    @click="openSubsystem(system)"
+                    :subsystem="system"
+                  />
                 </div>
               </div>
               <div v-else class="text-center text-gray-400 p-6">
@@ -101,6 +100,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import UserLayout from "@/layouts/UserLayout.vue";
 import SubsystemCard from "@/components/SubsystemCard.vue";
 import { LayoutDashboard } from "lucide-vue-next";
 
@@ -108,7 +108,6 @@ import { useAccountStore } from "@/stores/account";
 const accountStore = useAccountStore();
 
 import { useCategoriesStore } from "@/stores/user/categories";
-import UserLayout from "@/layouts/UserLayout.vue";
 const categoriesStore = useCategoriesStore();
 
 const selectedTabId = ref(null);
