@@ -14,7 +14,7 @@ app.use(
     //   "https://med.tu.ac.th/intra_dashboard",
     //   "https://med.tu.ac.th/intra_dashboard_dev_v1",
     // ], // frontend
-    orifin: "*",
+    origin: "*",
     credentials: true, // ถ้ามี cookie/token
   })
 );
@@ -37,6 +37,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(`${baseServerPath}/api`, require("./routes"));
 
+app.get(`${baseServerPath}/health`, (req, res) => {
+  res.status(200).json({ status: 'oks' });
+});
+
 // SPA fallback
 app.get(`${baseServerPath}/*`, (req, res) => {
   if (isProdection) {
@@ -45,9 +49,7 @@ app.get(`${baseServerPath}/*`, (req, res) => {
   res.end(`<h1>Backend server is started.</h1>`);
 });
 
-app.get(`${baseServerPath}/health`, (req, res) => {
-  res.status(200).json({ status: 'oks' });
-});
+
 
 
 // Start server
