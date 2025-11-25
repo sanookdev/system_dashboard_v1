@@ -7,13 +7,14 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      'http://172.17.1.250:5173',
-      "https://med.tu.ac.th",
-      "https://med.tu.ac.th/intra_dashboard",
-      "https://med.tu.ac.th/intra_dashboard_dev_v1",
-    ], // frontend
+    // origin: [
+    //   "http://localhost:5173",
+    //   'http://172.17.1.250:5173',
+    //   "https://med.tu.ac.th",
+    //   "https://med.tu.ac.th/intra_dashboard",
+    //   "https://med.tu.ac.th/intra_dashboard_dev_v1",
+    // ], // frontend
+    orifin: "*",
     credentials: true, // ถ้ามี cookie/token
   })
 );
