@@ -40,7 +40,7 @@ app.use(`${baseServerPath}/api`, require("./routes"));
 // SPA fallback
 app.get(`${baseServerPath}/*`, (req, res) => {
   if (isProdection) {
-    res.sendFile(path.join(distPath, "index.html"));
+    return res.sendFile(path.join(distPath, "index.html"));
   }
   res.end(`<h1>Backend server is started.</h1>`);
 });

@@ -1,0 +1,148 @@
+@echo off
+setlocal enabledelayedexpansion
+
+REM ================== CONFIG พื้นฐาน ==================
+REM แก้ path ให้ตรงกับโฟลเดอร์โปรดักชันจริง
+set "PROJECT_ROOT=C:\Users\Administrator\Desktop\services\intra_dashboard_prod\system_dashboard_v1"
+set "BACKUP_DIR=%PROJECT_ROOT%\backup"
+
+REM path ของ pm2.cmd (เช็คด้วย where pm2 หรือดูที่เคยใช้)
+set "PM2=C:\Users\Administrator\AppData\Roaming\npm\pm2.cmd"
+
+REM ชื่อ process ใน pm2
+set "PM2_NAME=INTRA_DASHBOARD_PROD:5177"
+
+REM URL สำหรับ Health Check (ปรับให้ตรงกับของจริง)
+set "HEALTH_URL=http://127.0.0.1:5177/health"
+
+echo === WORKSPACE: %CD% ===
+echo === PROJECT_ROOT: %PROJECT_ROOT% ===
+
+REM ================== 1) เตรียม BACKUP ==================
+echo.
+echo === STEP 1: BACKUP CURRENT VERSION ===
+
+if exist "%BACKUP_DIR%" (
+  echo [INFO] ลบ backup เดิม: "%BACKUP_DIR%"
+  rmdir /s /q "%BACKUP_DIR%"
+)
+
+mkdir "%BACKUP_DIR%"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] สร้างโฟลเดอร์ BACKUP ไม่สำเร็จ
+  exit /b 1
+)
+
+echo [INFO] Backup Backend...
+xcopy "%PROJECT_ROOT%\Backend\*" "%BACKUP_DIR%\Backend\" /E /H /C /I /Y /Q
+if %ERRORLEVEL% GEQ 4 (
+  echo [ERROR] Backup Backend ล้มเหลว
+  exit /b 1
+)
+
+echo [INFO] Backup Frontend...
+xcopy "%PROJECT_ROOT%\Frontend\*" "%BACKUP_DIR%\Frontend\" /E /H /C /I /Y /Q
+if %ERRORLEVEL% GEQ 4 (
+  echo [ERROR] Backup Frontend ล้มเหลว
+  exit /b 1
+)
+
+echo === BACKUP COMPLETED ===
+
+REM ================== 2) Install & Build Frontend ==================
+echo.
+echo === STEP 2: INSTALL & BUILD FRONTEND ===
+
+cd /d "%PROJECT_ROOT%\Frontend"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] เข้าโฟลเดอร์ Frontend ไม่ได้
+  goto ROLLBACK
+)
+
+echo [INFO] npm install (Frontend)...
+call npm install
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] npm install Frontend ล้มเหลว
+  goto ROLLBACK
+)
+
+echo [INFO] npm run build (Frontend)...
+call npm run build
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] npm run build ล้มเหลว
+  goto ROLLBACK
+)
+
+REM ================== 3) Install Backend Dependencies ==================
+echo.
+echo === STEP 3: INSTALL BACKEND DEPENDENCIES ===
+
+cd /d "%PROJECT_ROOT%\Backend"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] เข้าโฟลเดอร์ Backend ไม่ได้
+  goto ROLLBACK
+)
+
+echo [INFO] npm install (Backend)...
+call npm install
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] npm install Backend ล้มเหลว
+  goto ROLLBACK
+)
+
+REM ================== 4) Restart PM2 & Health Check ==================
+echo.
+echo === STEP 4: RESTART PM2 & HEALTH CHECK ===
+
+echo [INFO] Restart PM2 app: %PM2_NAME%
+call "%PM2%" delete "%PM2_NAME%" >nul 2>&1
+
+call "%PM2%" start server.js --name "%PM2_NAME%"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] pm2 start server.js ล้มเหลว
+  goto ROLLBACK
+)
+
+echo [INFO] รอให้ Server Boot ขึ้น 10 วินาที...
+timeout /t 10 /nobreak >nul
+
+echo [INFO] Health Check: %HEALTH_URL%
+curl -f -s -o NUL "%HEALTH_URL%"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] Health Check ไม่ผ่าน
+  goto ROLLBACK
+)
+
+echo.
+echo === DEPLOYMENT SUCCESSFUL ===
+goto END
+
+
+REM ================== ROLLBACK BLOCK ==================
+:ROLLBACK
+echo.
+echo !!! DEPLOYMENT FAILED - START ROLLBACK !!!
+
+echo [INFO] Restore Backend จาก BACKUP...
+xcopy "%BACKUP_DIR%\Backend\*" "%PROJECT_ROOT%\Backend\" /E /H /C /I /Y /Q
+
+echo [INFO] Restore Frontend จาก BACKUP...
+xcopy "%BACKUP_DIR%\Frontend\*" "%PROJECT_ROOT%\Frontend\" /E /H /C /I /Y /Q
+
+echo [INFO] Restart เวอร์ชันเดิมผ่าน PM2...
+cd /d "%PROJECT_ROOT%\Backend"
+call "%PM2%" delete "%PM2_NAME%" >nul 2>&1
+call "%PM2%" start server.js --name "%PM2_NAME%"
+
+echo [INFO] PM2 Logs (50 บรรทัดล่าสุด)...
+call "%PM2%" logs "%PM2_NAME%" --lines 50 --nostream
+
+echo !!! ROLLBACK COMPLETED (EXIT CODE 1) !!!
+exit /b 1
+
+
+REM ================== END ==================
+:END
+echo.
+echo === SCRIPT FINISHED (EXIT CODE 0) ===
+exit /b 0
