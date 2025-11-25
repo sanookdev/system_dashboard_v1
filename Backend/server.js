@@ -46,7 +46,7 @@ app.get(`${baseServerPath}/*`, (req, res) => {
 });
 
 app.get(`${baseServerPath}/health`, (req, res) => {
-  res.status(200).json('Hello');
+  res.status(200).json({ status: 'oks' });
 });
 
 

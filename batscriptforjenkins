@@ -10,10 +10,10 @@ REM path ของ pm2.cmd (เช็คด้วย where pm2 หรือด�
 set "PM2=C:\Users\Administrator\AppData\Roaming\npm\pm2.cmd"
 
 REM ชื่อ process ใน pm2
-set "PM2_NAME=INTRA_DASHBOARD_PROD:5177"
+set "PM2_NAME=INTRA_DASHBOARD_PROD:5057"
 
 REM URL สำหรับ Health Check (ปรับให้ตรงกับของจริง)
-set "HEALTH_URL=http://127.0.0.1:5177/health"
+set "HEALTH_URL=http://127.0.0.1:5057/health"
 
 echo === WORKSPACE: %CD% ===
 echo === PROJECT_ROOT: %PROJECT_ROOT% ===
