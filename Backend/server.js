@@ -45,6 +45,11 @@ app.get(`${baseServerPath}/*`, (req, res) => {
   res.end(`<h1>Backend server is started.</h1>`);
 });
 
+app.get(`${baseServerPath}/health`, (req, res) => {
+  res.status(200).json('Hello');
+});
+
+
 // Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(
