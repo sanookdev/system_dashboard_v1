@@ -1,0 +1,16 @@
+# VITE_APP_ENV=development
+VITE_APP_ENV=development
+VITE_BASE_PATH=/intra_dashboard_v1
+VITE_BASE_PATH_PRODUCTION=/intra_dashboard_v1
+
+VITE_IS_PRODUCTION=false
+
+VITE_API_DEVELOPMENT=your_api_url
+VITE_API_PRODUCTION=your_api_url
+
+VITE_APPLICATION_KEY=your_application_key
+
+VITE_APPLICATION_KEY_AVATAR=your_application_key
+
+
+# ON SERVER 172.18.1.36:8522
