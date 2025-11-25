@@ -20,6 +20,7 @@ module.exports = {
               "created_at",
               "created_by",
               "updated_at",
+              "img_icon"
             ],
           },
           {

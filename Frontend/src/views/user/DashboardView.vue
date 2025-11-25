@@ -128,7 +128,6 @@ onMounted(async () => {
   if (categories.value[0]?.id) {
     selectedTabId.value = categories.value[0].id;
   }
-
   console.log(systems.value);
 });
 const selectTab = (id) => {

@@ -70,7 +70,7 @@
               >
                 <div class="flex items-center gap-2 cursor-pointer p-2">
                   <component
-                    :is="system.icon"
+                    :is="!system.img_icon ? system.icon : system.img_icon"
                     class="inline-block w-4 h-4 mr-2"
                   />
                   <div></div>

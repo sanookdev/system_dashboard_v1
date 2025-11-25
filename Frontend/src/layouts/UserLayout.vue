@@ -159,7 +159,7 @@ const defaultAvatar = ref(
 const avatarUrl = ref(null);
 
 const imgUrlFooterSidebar = ref(
-  "/medias/Flux_Dev_Create_an_intricate_illustration_that_visually_repres_0.jpg"
+  `${import.meta.env.VITE_BASE_PATH}/medias/Flux_Dev_Create_an_intricate_illustration_that_visually_repres_0.jpg`
 );
 const activeMenu = ref("");
 

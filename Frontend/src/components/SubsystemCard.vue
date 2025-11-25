@@ -8,9 +8,21 @@
       >
         <div class="flex justify-between">
           <div>
-            <component
+            <!-- <component
               color="green"
+              :is="subsystem.img_icon ? `intra_dashboard${subsystem.img_icon}` : subsystem.icon"
+              class="w-20 h-20 p-4"
+            /> -->
+            <img
+              v-if="subsystem.img_icon"
+              :src="`${basePath}${subsystem.img_icon}`"
+              class="w-20 h-20 p-4"
+            />
+
+            <component
+              v-else
               :is="subsystem.icon"
+              color="green"
               class="w-20 h-20 p-4"
             />
           </div>
@@ -32,10 +44,10 @@
 </template>
 
 <script setup>
+const basePath = import.meta.env.VITE_BASE_PATH_PRODUCTION;
 defineProps({
   subsystem: Object,
 });
-
 function onClick() {
   // redirect หรือเปิดลิงก์ระบบย่อย พร้อมแนบ token ถ้าต้องการ
   window.open(subsystem.link, "_blank");

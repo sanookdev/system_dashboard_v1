@@ -17,7 +17,7 @@ export const useCategoriesStore = defineStore("categories", {
       try {
         const accountStore = useAccountStore();
         const response = accountStore.user.role === 'user' ? await api.get("/user/category/list") : '';
-
+        console.log(response)
         if (response.data?.status) {
           this.list = response.data.categories || [];
           localStorage.setItem("categories", JSON.stringify(this.list));

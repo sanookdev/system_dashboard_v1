@@ -19,7 +19,9 @@ const app = createApp(App);
 for (const [key, component] of Object.entries(lucide)) {
   app.component(key, component);
 }
+
 app.config.globalProperties.$alertify = alertify;
+
 
 router.beforeEach((to, from, next) => {
   const defaultTitle = "ชื่อเว็บไซต์ของคุณ";
