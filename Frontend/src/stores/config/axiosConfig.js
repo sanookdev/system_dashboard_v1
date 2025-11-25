@@ -1,6 +1,8 @@
+const isProduction = import.meta.env.VITE_IS_PRODUCTION === "true"
+
 const baseApiUrl =
-  import.meta.env.VITE_APP_ENV === "development"
-    ? import.meta.env.VITE_API_DEVELOPMENT
-    : import.meta.env.VITE_API_PRODUCTION;
+  isProduction
+    ? import.meta.env.VITE_API_PRODUCTION
+    : import.meta.env.VITE_API_DEVELOPMENT;
 
 export default baseApiUrl;

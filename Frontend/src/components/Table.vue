@@ -116,7 +116,7 @@ const props = defineProps({
   view_button: Boolean,
 });
 
-const rowsPerPage = 5;
+const rowsPerPage = 15;
 const currentPage = ref(1);
 
 const totalPages = computed(() => Math.ceil(props.rows.length / rowsPerPage));

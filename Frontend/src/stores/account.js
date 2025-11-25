@@ -22,6 +22,7 @@ export const useAccountStore = defineStore("account", {
     },
     async login(userLogin) {
       try {
+        console.log('baseApiUrl = ' + baseApiUrl)
         if (!userLogin?.username || !userLogin?.password) {
           this.response.message = "กรุณากรอกข้อมูล Username และ Password!";
           this.response.status = false;
@@ -107,19 +108,19 @@ export const useAccountStore = defineStore("account", {
       }
     },
     async logout() {
-      this.clearStorage();
+      await this.clearStorage();
       this.isLoggedIn = false;
       this.user = {};
       this.token = null;
     },
 
-    async clearStorage() {
-      await localStorage.removeItem("user");
-      await localStorage.removeItem("token");
-      await localStorage.removeItem("isLoggedIn");
-      await localStorage.removeItem("systems");
-      await localStorage.removeItem("permissionList");
-      await localStorage.removeItem("categories");
+    clearStorage() {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("systems");
+      localStorage.removeItem("permissionList");
+      localStorage.removeItem("categories");
     },
 
     async ssoStart(system_id) {

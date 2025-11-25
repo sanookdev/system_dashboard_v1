@@ -1,8 +1,12 @@
 import axios from "axios";
 import { useAccountStore } from "@/stores/account";
 
+const isProduction = import.meta.env.VITE_IS_PRODUCTION === "true"
+
+const baseApi = isProduction ? import.meta.env.VITE_API_PRODUCTION : import.meta.env.VITE_API_DEVELOPMENT;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_DEVELOPMENT,
+  baseURL: baseApi,
 });
 
 // Axios Interceptor เพื่อ refresh token ทุกครั้งก่อนส่ง request
@@ -20,7 +24,7 @@ api.interceptors.request.use(
     try {
       // เรียก API สำหรับ refresh token
       const res = await axios.get(
-        `${import.meta.env.VITE_API_DEVELOPMENT}auth/authenticate`,
+        `${baseApi}auth/authenticate`,
         {
           headers: {
             Authorization: `Bearer ${accountStore.token}`,
