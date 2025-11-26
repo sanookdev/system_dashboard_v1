@@ -13,10 +13,45 @@ REM ชื่อ process ใน pm2
 set "PM2_NAME=INTRA_DASHBOARD_PROD:5057"
 
 REM URL สำหรับ Health Check (ปรับให้ตรงกับของจริง)
-set "HEALTH_URL=http://127.0.0.1:5057/health"
+set "HEALTH_URL=http://med.tu.ac.th/intra_dashboard/health"
 
 echo === WORKSPACE: %CD% ===
 echo === PROJECT_ROOT: %PROJECT_ROOT% ===
+
+
+REM ================== 0) UPDATE CODE FROM GIT ==================
+echo.
+echo === STEP 0: UPDATE CODE FROM GIT ===
+cd /d "%PROJECT_ROOT%"
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] เข้า PROJECT_ROOT ไม่ได้
+  exit /b 1
+)
+
+REM เช็คว่ามี .git ไหม
+if not exist ".git" (
+  echo [ERROR] ไม่พบ .git ใน %PROJECT_ROOT%
+  echo กรุณา clone โปรเจกต์ไว้ก่อน
+  exit /b 1
+)
+
+echo [INFO] git fetch origin ...
+git fetch origin
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] git fetch origin ล้มเหลว
+  exit /b 1
+)
+
+REM ใช้ reset แบบปลอดภัยกว่า pull
+echo [INFO] git reset --hard origin/main ...
+git reset --hard origin/main
+if %ERRORLEVEL% NEQ 0 (
+  echo [ERROR] git reset ล้มเหลว
+  exit /b 1
+)
+
+echo === GIT UPDATE COMPLETED ===
+
 
 REM ================== 1) เตรียม BACKUP ==================
 echo.
@@ -107,11 +142,22 @@ echo [INFO] รอให้ Server Boot ขึ้น 10 วินาที...
 timeout /t 10 /nobreak >nul
 
 echo [INFO] Health Check: %HEALTH_URL%
-curl -f -s -o NUL "%HEALTH_URL%"
-if %ERRORLEVEL% NEQ 0 (
-  echo [ERROR] Health Check ไม่ผ่าน
-  goto ROLLBACK
+
+for /f "usebackq tokens=1" %%H in (`
+    curl -L -s -o NUL -w "%%{http_code}" "%HEALTH_URL%"
+`) do (
+    set "HTTP_CODE=%%H"
 )
+
+echo PROD Health HTTP_CODE=!HTTP_CODE!
+
+IF NOT "!HTTP_CODE!"=="200" (
+    echo [ERROR] PROD health check failed with HTTP !HTTP_CODE!
+    echo [ERROR] Health Check ไม่ผ่าน
+    goto ROLLBACK
+)
+
+echo [OK] PROD health check passed.
 
 echo.
 echo === DEPLOYMENT SUCCESSFUL ===
