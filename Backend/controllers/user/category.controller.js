@@ -11,14 +11,17 @@ module.exports = {
         where: {
           [Op.or]: [
             { public: 1 },                                // ใครก็เห็นได้
-            { "$permissions.employee_code$": employee_code }, // หรือมีสิทธิ์ใน category นั้น
+            {
+              public: 0,
+              "$permissions.employee_code$": employee_code
+            }
           ],
         },
         include: [
           {
             model: CategoryPermission,
             as: "permissions",
-            required: false,   // ไม่บังคับ join เพื่อให้ public category โชว์ด้วย
+            required: true,   // ไม่บังคับ join เพื่อให้ public category โชว์ด้วย
             where: { employee_code },
             attributes: [],
           },
