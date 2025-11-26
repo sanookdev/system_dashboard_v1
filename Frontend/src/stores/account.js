@@ -125,7 +125,7 @@ export const useAccountStore = defineStore("account", {
 
     async ssoStart(system_id) {
       try {
-        const apiUrl = import.meta.env.VITE_API_DEVELOPMENT
+        const apiUrl = import.meta.env.VITE_IS_PRODUCTION === "true" ? import.meta.env.VITE_API_PRODUCTION : import.meta.env.VITE_API_DEVELOPMENT
         const response = await api.post(`${apiUrl}auth/sso/start`, {
           system_id: system_id,
           redirect_uri: `${apiUrl}auth/introspect`
