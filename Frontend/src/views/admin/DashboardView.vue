@@ -175,7 +175,7 @@ const openSubsystem = async (system) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (authorizeResponse.status) {
-      window.open(redirect_to_subsystem, "__blank");
+      window.open(redirect_to_subsystem, "_blank");
     } else {
       alert(authorizeResponse.message);
     }
