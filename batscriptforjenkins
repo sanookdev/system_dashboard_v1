@@ -13,7 +13,7 @@ REM ชื่อ process ใน pm2
 set "PM2_NAME=INTRA_DASHBOARD_PROD:5057"
 
 REM URL สำหรับ Health Check (ปรับให้ตรงกับของจริง)
-set "HEALTH_URL=http://med.tu.ac.th/intra_dashboard/health"
+set "HEALTH_URL=https://med.tu.ac.th/intra_dashboard/health"
 
 echo === WORKSPACE: %CD% ===
 echo === PROJECT_ROOT: %PROJECT_ROOT% ===
