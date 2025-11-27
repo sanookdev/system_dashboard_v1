@@ -14,7 +14,9 @@ app.use(
       "https://med.tu.ac.th/intra_dashboard",
       "https://med.tu.ac.th/intra_dashboard_dev_v1",
       "http://203.131.209.137/main/income_display",
-      "http://203.131.209.137"
+      "http://203.131.209.137",
+      "https://student.med.tu.ac.th",
+      "https://student.med.tu.ac.th/serviceTechno",
     ], // frontend
     // origin: "*",
     credentials: true, // ถ้ามี cookie/token
