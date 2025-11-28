@@ -2,19 +2,23 @@
   <div>
     <UserLayout>
       <div class="flex justify-between">
-        <div class="flex items-center gap-2 text-sm">
-          <div class="label">จำนวนระบบทั้งหมด :</div>
-          <div class="text-accent">{{ systems.length }} ระบบ</div>
+        <div class="flex flex-col md:flex-row gap-10">
+          <div class="flex items-center gap-2 text-sm">
+            <div class="label">จำนวนระบบทั้งหมด :</div>
+            <div class="text-accent">{{ systems.length }} ระบบ</div>
+          </div>
+          <div class="w-auto md:w-100">
+            <label class="input input-bordered flex items-center gap-2 h-10">
+              <input
+                type="text"
+                class="grow w-full max-w-xs"
+                placeholder="ค้นหาระบบ..."
+                v-model="searchQuery"
+              />
+              <Search class="w-4 h-4 opacity-70" />
+            </label>
+          </div>
         </div>
-        <label class="input input-bordered flex items-center gap-2 h-10">
-          <input
-            type="text"
-            class="grow w-full max-w-xs"
-            placeholder="ค้นหาระบบ..."
-            v-model="searchQuery"
-          />
-          <Search class="w-4 h-4 opacity-70" />
-        </label>
         <div class="hidden md:flex items-center gap-4">
           <div
             class="bg-accent rounded-xl p-2 cursor-pointer"
@@ -177,7 +181,9 @@ const openSubsystem = async (system) => {
 
     const token = encodeURIComponent(accountStore.token);
     const { id: system_id, url: system_url } = system;
-    const redirect_to_subsystem = `${system_url}?token=${token}`;
+    const redirect_to_subsystem = system.sso
+      ? `${system_url}?token=${token}`
+      : system_url;
     const ssoResponse = await accountStore.ssoStart(system_id);
     if (!ssoResponse?.status) {
       throw new Error(ssoResponse?.message || "เริ่ม SSO ไม่สำเร็จ");
