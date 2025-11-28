@@ -177,11 +177,13 @@ const openSubsystem = async (system) => {
   try {
     redirectLoading.value = true;
     redirectLoadingText.value = "กำลังยืนยันตัวตน...";
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const token = encodeURIComponent(accountStore.token);
     const { id: system_id, url: system_url } = system;
-    const redirect_to_subsystem = `${system_url}?token=${token}`;
+    const redirect_to_subsystem = system.sso
+      ? `${system_url}?token=${token}`
+      : system_url;
     const ssoResponse = await accountStore.ssoStart(system_id);
     if (!ssoResponse?.status) {
       throw new Error(ssoResponse?.message || "เริ่ม SSO ไม่สำเร็จ");
@@ -189,7 +191,7 @@ const openSubsystem = async (system) => {
       console.log("sso pass");
       redirectLoadingText.value = "กำลังเช็คสิทธิ์การใช้งาน...";
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const authorizeResponse = ssoResponse.status
       ? await accountStore.authorize_system(ssoResponse.redirect, system_id)

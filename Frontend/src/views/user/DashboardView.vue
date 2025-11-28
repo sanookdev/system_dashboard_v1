@@ -177,7 +177,7 @@ const openSubsystem = async (system) => {
   try {
     redirectLoading.value = true;
     redirectLoadingText.value = "กำลังยืนยันตัวตน...";
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const token = encodeURIComponent(accountStore.token);
     const { id: system_id, url: system_url } = system;
@@ -191,7 +191,7 @@ const openSubsystem = async (system) => {
       console.log("sso pass");
       redirectLoadingText.value = "กำลังเช็คสิทธิ์การใช้งาน...";
     }
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const authorizeResponse = ssoResponse.status
       ? await accountStore.authorize_system(ssoResponse.redirect, system_id)
@@ -206,7 +206,7 @@ const openSubsystem = async (system) => {
       console.log("authorize system pass");
       redirectLoadingText.value = "กำลังนำท่านเข้าสู่ระบบ...";
     }
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (authorizeResponse.status) {
       window.open(redirect_to_subsystem, "_blank");
