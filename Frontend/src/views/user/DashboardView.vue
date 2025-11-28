@@ -6,6 +6,15 @@
           <div class="label">จำนวนระบบทั้งหมด :</div>
           <div class="text-accent">{{ systems.length }} ระบบ</div>
         </div>
+        <label class="input input-bordered flex items-center gap-2 h-10">
+          <input
+            type="text"
+            class="grow w-full max-w-xs"
+            placeholder="ค้นหาระบบ..."
+            v-model="searchQuery"
+          />
+          <Search class="w-4 h-4 opacity-70" />
+        </label>
         <div class="hidden md:flex items-center gap-4">
           <div
             class="bg-accent rounded-xl p-2 cursor-pointer"
@@ -68,10 +77,19 @@
                 :key="system.id"
                 class="p-2 hover:bg-base-200 rounded-full"
               >
-                <div class="flex items-center gap-2 cursor-pointer p-2">
+                <div
+                  class="flex items-center gap-2 cursor-pointer p-2"
+                  @click="openSubsystem(system)"
+                >
+                  <img
+                    v-if="system.img_icon"
+                    :src="`${basePath}${system.img_icon}`"
+                    class="inline-block w-6 h-6 mr-2 object-contain"
+                  />
                   <component
+                    v-else
                     :is="system.icon"
-                    class="inline-block w-4 h-4 mr-2"
+                    class="inline-block w-6 h-6 mr-2"
                   />
                   <div></div>
                   <div class="font-bold">{{ system.name }}</div>
@@ -110,6 +128,10 @@ const accountStore = useAccountStore();
 import { useCategoriesStore } from "@/stores/user/categories";
 const categoriesStore = useCategoriesStore();
 
+const basePath = import.meta.env.VITE_BASE_PATH_PRODUCTION || "";
+
+const searchQuery = ref("");
+
 const selectedTabId = ref(null);
 
 const redirectLoadingText = ref("...");
@@ -118,9 +140,16 @@ const categories = computed(() => categoriesStore.list);
 
 const systems = computed(() => {
   const selected = categories.value.find((c) => c.id === selectedTabId.value);
-  return selected?.systems || [];
-});
+  let list = selected?.systems || [];
 
+  // ถ้ามีการพิมพ์ค้นหา ให้กรองเฉพาะที่มีชื่อตรงกัน
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    list = list.filter((system) => system.name.toLowerCase().includes(query));
+  }
+
+  return list;
+});
 const redirectLoading = ref(false);
 
 onMounted(async () => {

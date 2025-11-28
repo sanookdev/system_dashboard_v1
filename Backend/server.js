@@ -5,23 +5,26 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      'http://172.17.1.250:5173',
-      "https://med.tu.ac.th",
-      "https://med.tu.ac.th/intra_dashboard",
-      "https://med.tu.ac.th/intra_dashboard_dev_v1",
-      "http://203.131.209.137/main/income_display",
-      "http://203.131.209.137",
-      "https://student.med.tu.ac.th",
-      "https://student.med.tu.ac.th/serviceTechno",
-    ], // frontend
-    // origin: "*",
-    credentials: true, // ถ้ามี cookie/token
-  })
-);
+const allowedOrigins = [
+  "http://localhost:5173",
+  'http://172.17.1.250:5173',
+  "https://med.tu.ac.th",
+  "https://med.tu.ac.th/intra_dashboard",
+  "http://203.131.209.137/main/income_display",
+  "http://203.131.209.137",
+  "https://student.med.tu.ac.th",
+  "https://student.med.tu.ac.th/serviceTechno",
+];
+
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+    else cb(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "application-key"],
+  credentials: true,
+}));
 
 app.disable("x-powered-by");
 const port = process.env.PORT || 3000;

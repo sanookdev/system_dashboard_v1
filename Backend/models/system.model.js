@@ -46,7 +46,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      img_icon: { type: DataTypes.STRING, allowNull: true }
+      img_icon: { type: DataTypes.STRING, allowNull: true },
+      sso: { type: DataTypes.BOOLEAN, allowNull: true }
     },
     {
       tableName: "systems",

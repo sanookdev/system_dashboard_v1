@@ -7,25 +7,29 @@
         class="flex flex-col justify-between gap-4 px-3 py-6 w-[240px] h-[200px] md:w-[160px] md:h-[200px] xl:w-[200px] xl:h-[188px]"
       >
         <div class="flex justify-between">
-          <div>
-            <!-- <component
-              color="green"
-              :is="subsystem.img_icon ? `intra_dashboard${subsystem.img_icon}` : subsystem.icon"
-              class="w-20 h-20 p-4"
-            /> -->
-            <img
-              v-if="subsystem.img_icon"
-              :src="`${basePath}${subsystem.img_icon}`"
-              class="w-20 h-20 p-4"
-            />
+          <div class="flex">
+            <div>
+              <img
+                v-if="subsystem.img_icon"
+                :src="`${basePath}${subsystem.img_icon}`"
+                class="w-20 h-20 p-4"
+              />
 
-            <component
-              v-else
-              :is="subsystem.icon"
-              color="green"
-              class="w-20 h-20 p-4"
-            />
+              <component
+                v-else
+                :is="subsystem.icon"
+                color="green"
+                class="w-20 h-20 p-4"
+              />
+            </div>
+            <div
+              v-if="subsystem.sso"
+              class="text-xs badge text-nowrap badge-warning flex justify-end"
+            >
+              SSO
+            </div>
           </div>
+
           <div>
             <ArrowRight />
           </div>
