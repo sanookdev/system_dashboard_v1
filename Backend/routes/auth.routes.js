@@ -110,6 +110,31 @@ router.get(
       });
     }
   }
+); router.get(
+  "/authenticate/sso",
+  verifyApplicationKey,
+  verifyToken,
+  refreshToken,
+  async (req, res) => {
+    try {
+      let user = await decodeToken(req.headers["authorization"]);
+      let authorize = await authController.authorizeSystem(user.username);
+      res.json({
+        status: true,
+        message: "Token is valid!",
+        user: {
+          ...user
+        },
+        refreshToken: req.refreshedToken,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: "Failed to authenticate user",
+        error: error.message,
+      });
+    }
+  }
 );
 
 router.get(
@@ -210,6 +235,112 @@ router.post("/sso/start", verifyApplicationKey, verifyToken, async (req, res) =>
   }
 
 });
+router.post("/sso_other/start", verifyApplicationKey, verifyToken, async (req, res) => {
+  try {
+    const { system_id, redirect_uri } = req.body || {}
+    if (!system_id || !redirect_uri) return res.status(401).json({ status: false, message: "system_id and redirect_uri was required!" })
+    const code = crypto.randomUUID();
+    const state = crypto.randomUUID();
+    await cache.set(`code:${code}`, {
+      user: { id: req.user.sub, username: req.user.username },
+      system_id,
+      exp: Date.now() + 60_000, // 60s
+      state
+    }, 60);
+    const url = new URL(redirect_uri);
+    url.searchParams.set("code", code);
+    url.searchParams.set("state", state);
+    url.searchParams.set("system_id", system_id);
+    return res.status(200).json({ status: true, redirect: url.toString(), query: `?code=${code}&state=${state}&system_id=${system_id}` });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: "เกิดข้อผิดพลาด /sso/start", error: error.message })
+  }
+
+});
+router.get(
+  "/introspect_other",
+  verifyApplicationKey,
+  [
+    check("code").notEmpty().withMessage("code is required"),
+    check("state").notEmpty().withMessage("state is required"),
+    check("system_id").notEmpty().withMessage("system_id is required"),
+
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return badRequest(res, "Validation error", { error: checkErr.errors });
+    }
+
+    try {
+      if (!req.body) {
+        return badRequest(res, "Missing body");
+      }
+      const { code, state, system_id } = req.query || {}
+
+      console.log('code = ' + code)
+      console.log('state = ' + state)
+
+      // 1) ดึงข้อมูลจาก cache ด้วย code
+      const cacheKey = `code:${code}`;
+      const data = await cache.get(cacheKey);
+
+      if (!data) {
+        return unauthorized(res, "invalid or expired code");
+      }
+
+      // 2) ตรวจ state ให้ตรงกัน
+      if (data.state !== state) {
+        // กันกรณีโดนดัก code แล้วเอาไปยิงเอง
+        await cache.del(cacheKey); // ลบทิ้งอยู่ดี กัน reuse
+        return unauthorized(res, "invalid state");
+      }
+      // 3) ตรวจหมดอายุ
+      if (data.exp && data.exp < Date.now()) {
+        await cache.del(cacheKey);
+        return unauthorized(res, "code expired");
+      }
+
+      // 4) ตรวจว่า code นี้ออกให้ system นี้จริงไหม
+      if (String(data.system_id) !== String(system_id)) {
+        return forbidden(res, "code is not issued for this system");
+      }
+
+      // 5) ลบ code ออกจาก cache ให้เป็น one-time
+      await cache.del(cacheKey);
+
+      const user = data.user; // มาจาก verifyToken แล้ว เช่น { sub, username, isAdmin, roles, exp, ... }
+
+      if (!user) {
+        return unauthorized(res, "invalid or missing token");
+      }
+
+      // ตรวจสิทธิ์ในระบบย่อยจากศูนย์กลาง
+      const verify = await authController.verifySystem(user.username, system_id);
+
+      // สมมติ verify คืน { status:boolean, roles?:[], perms?:[], isAdmin?:boolean, message?:string }
+      if (!verify?.status) {
+        return forbidden(res, verify?.message || "No permission for this system");
+      }
+
+      return res.status(200).json({
+        status: true,
+        user: {
+          id: user.sub,
+          username: user.username,
+          isAdmin: !!verify.isAdmin, // หรือจะ fallback เป็น !!user.isAdmin ก็ได้หากมีใน token
+        },
+        system_id,
+        roles: verify.roles || [],
+        perms: verify.perms || [],
+        // ส่ง exp ของ token ปัจจุบันกลับไปเผื่อระบบย่อย cache ตามอายุ token
+        exp: user.exp,
+      });
+    } catch (error) {
+      return serverError(res, error);
+    }
+  }
+);
 
 router.post(
   "/introspect",

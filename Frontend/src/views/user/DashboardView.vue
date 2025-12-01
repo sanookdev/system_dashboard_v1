@@ -62,7 +62,11 @@
                 >
                   <SubsystemCard
                     v-if="system"
-                    @click="openSubsystem(system)"
+                    @click="
+                      system.sso_code
+                        ? openSubsystemCode(system)
+                        : openSubsystem(system)
+                    "
                     :subsystem="system"
                   />
                 </div>
@@ -83,7 +87,11 @@
               >
                 <div
                   class="flex items-center gap-2 cursor-pointer p-2"
-                  @click="openSubsystem(system)"
+                  @click="
+                    system.sso_code
+                      ? openSubsystemCode(system)
+                      : openSubsystem(system)
+                  "
                 >
                   <img
                     v-if="system.img_icon"
@@ -173,6 +181,35 @@ const toggleListView = () => {
   isListView.value = !isListView.value;
 };
 
+const openSubsystemCode = async (system) => {
+  try {
+    redirectLoading.value = true;
+    redirectLoadingText.value = "กำลังยืนยันตัวตน...";
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { id: system_id, url: system_url } = system;
+    const ssoResponse = await accountStore.ssoStart_other(system_id);
+    console.log(ssoResponse);
+    if (!ssoResponse?.status) {
+      throw new Error(
+        ssoResponse?.message || "ไม่สามารถยืนยันสิทธิ์เข้าใช้ระบบย่อยได้"
+      );
+    } else {
+      if (ssoResponse.status) {
+        console.log(ssoResponse);
+        console.log("sso pass");
+        const redirect_to_subsystem = system.sso
+          ? `${system_url}${ssoResponse.query}`
+          : system_url;
+        console.log(redirect_to_subsystem);
+        window.open(redirect_to_subsystem, "_blank");
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    redirectLoading.value = false;
+  }
+};
 const openSubsystem = async (system) => {
   try {
     redirectLoading.value = true;

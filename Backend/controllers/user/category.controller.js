@@ -40,7 +40,8 @@ module.exports = {
               "created_by",
               "updated_at",
               "img_icon",
-              "sso"
+              "sso",
+              "sso_code"
             ],
             include: [
               {
@@ -123,7 +124,8 @@ module.exports = {
               "created_by",
               "updated_at",
               "img_icon",
-              "sso"
+              "sso",
+              "sso_code"
             ],
             include: [
               {

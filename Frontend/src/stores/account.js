@@ -136,6 +136,19 @@ export const useAccountStore = defineStore("account", {
         console.error(error)
       }
     },
+    async ssoStart_other(system_id) {
+      try {
+        const apiUrl = import.meta.env.VITE_IS_PRODUCTION === "true" ? import.meta.env.VITE_API_PRODUCTION : import.meta.env.VITE_API_DEVELOPMENT
+        console.log(apiUrl)
+        const response = await api.post(`${apiUrl}auth/sso_other/start`, {
+          system_id: system_id,
+          redirect_uri: `${apiUrl}auth/introspect_other`
+        })
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
+    },
     async authorize_system(redirect_auth, system_id) {
       try {
         const response = await api.post(redirect_auth, { system_id: system_id })
