@@ -241,6 +241,7 @@ router.post("/sso_other/start", verifyApplicationKey, verifyToken, async (req, r
     if (!system_id || !redirect_uri) return res.status(401).json({ status: false, message: "system_id and redirect_uri was required!" })
     const code = crypto.randomUUID();
     const state = crypto.randomUUID();
+    console.log(req.user.sub)
     await cache.set(`code:${code}`, {
       user: { id: req.user.sub, username: req.user.username },
       system_id,
@@ -254,6 +255,27 @@ router.post("/sso_other/start", verifyApplicationKey, verifyToken, async (req, r
     return res.status(200).json({ status: true, redirect: url.toString(), query: `?code=${code}&state=${state}&system_id=${system_id}` });
   } catch (error) {
     return res.status(500).json({ status: false, message: "เกิดข้อผิดพลาด /sso/start", error: error.message })
+  }
+
+}); router.post("/sso_v1/start", verifyApplicationKey, async (req, res) => {
+  try {
+    const { system_id, redirect_uri } = req.body || {}
+    if (!system_id || !redirect_uri) return res.status(401).json({ status: false, message: "system_id and redirect_uri was required!" })
+    const code = crypto.randomUUID();
+    const state = crypto.randomUUID();
+    await cache.set(`code:${code}`, {
+      user: { username: 'ASU0020' },
+      system_id,
+      exp: Date.now() + 60_000, // 60s
+      state
+    }, 60);
+    const url = new URL(redirect_uri);
+    url.searchParams.set("code", code);
+    url.searchParams.set("state", state);
+    url.searchParams.set("system_id", system_id);
+    return res.status(200).json({ status: true, redirect: url.toString(), query: `?code=${code}&state=${state}&system_id=${system_id}` });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: "Error: /sso_v1/start", error: error.message })
   }
 
 });
