@@ -4,7 +4,7 @@
       <transition name="fade-scale" mode="out-in" appear>
         <ul class="list bg-base-100 rounded-xl shadow-md">
           <li
-            class="list-row"
+            class="list-row cursor-pointer hover:bg-base-200 transition-colors"
             v-for="(page, index) in downloadList"
             :key="index"
             @click="openLink(page.link)"
@@ -17,7 +17,7 @@
             <div class="list-col-grow">
               <div class="text-xl">{{ page.title }}</div>
               <div class="text-md opacity-60">
-                {{ page.description }} link : {{ page.link }}
+                {{ page.description }}
               </div>
             </div>
           </li>
