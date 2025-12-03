@@ -6,6 +6,7 @@ import PermissionView from "@/views/admin/PermissionView.vue";
 import AdminCategory from "@/views/admin/CategoryView.vue";
 import AdminSystems from "@/views/admin/SystemsView.vue";
 import UserDashboard from "@/views/user/DashboardView.vue";
+import Downloadpage from "@/views/DownloadView.vue"
 // ✅ import store
 import { useAccountStore } from "@/stores/account";
 const router = createRouter({
@@ -40,6 +41,23 @@ const router = createRouter({
       name: "user-dashboard",
       component: UserDashboard,
       meta: { title: "User-Dashboard", requiresAuth: true, role: 'user' }
+    },
+    {
+      path: "/superadmin/downloadpage",
+      name: "superadmin-downloadpage",
+      component: Downloadpage,
+      meta: { title: "Download", requiresAuth: true, role: ["user", "superadmin", "admin"] }
+    },
+    {
+      path: "/user/downloadpage",
+      name: "user-downloadpage",
+      component: Downloadpage,
+      meta: { title: "Download", requiresAuth: true, role: ["user", "superadmin", "admin"] }
+    }, {
+      path: "/downloadpage",
+      name: "downloadpage",
+      component: Downloadpage,
+      meta: { title: "Download", requiresAuth: true, role: ["user", "superadmin", "admin"] }
     },
     {
       path: "/login",

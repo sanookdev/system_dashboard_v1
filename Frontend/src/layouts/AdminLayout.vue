@@ -177,7 +177,7 @@
   <!-- Main content -->
 </template>
 <script setup>
-import {  ref, watchEffect, onMounted } from "vue";
+import { ref, watchEffect, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { fetchAvatarUrl } from "@/utils/profileImgByUsername";
 import Footer from "@/layouts/Footer.vue";
@@ -194,7 +194,9 @@ const defaultAvatar = ref(
 const avatarUrl = ref(null);
 
 const imgUrlFooterSidebar = ref(
-  `${import.meta.env.VITE_BASE_PATH}/medias/Flux_Dev_Create_an_intricate_illustration_that_visually_repres_0.jpg`
+  `${
+    import.meta.env.VITE_BASE_PATH
+  }/medias/Flux_Dev_Create_an_intricate_illustration_that_visually_repres_0.jpg`
 );
 const activeMenu = ref("");
 
