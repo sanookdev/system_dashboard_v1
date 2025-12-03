@@ -8,7 +8,7 @@
           >
             {{ index + 1 }}
           </div>
-          <div class="list-col-grow w-[50%]">
+          <div class="list-col-grow">
             <div class="text-xl">{{ page.title }}</div>
             <div class="text-md opacity-60">
               {{ page.description }} link : {{ page.link }}
