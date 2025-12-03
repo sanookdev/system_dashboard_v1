@@ -1,46 +1,52 @@
 <template>
   <div>
     <UserLayout>
-      <ul class="list bg-base-100 rounded-xl shadow-md">
-        <li class="list-row" v-for="(page, index) in downloadList" :key="index">
-          <div
-            class="text-4xl w-10 font-thin opacity-60 flex justify-center tabular-nums"
+      <transition name="fade-scale" mode="out-in" appear>
+        <ul class="list bg-base-100 rounded-xl shadow-md">
+          <li
+            class="list-row"
+            v-for="(page, index) in downloadList"
+            :key="index"
           >
-            {{ index + 1 }}
-          </div>
-          <div class="list-col-grow">
-            <div class="text-xl">{{ page.title }}</div>
-            <div class="text-md opacity-60">
-              {{ page.description }} link : {{ page.link }}
-            </div>
-          </div>
-          <a
-            :href="page.link"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-square btn-ghost"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-external-link-icon lucide-external-link"
+            <div
+              class="text-4xl w-10 font-thin opacity-60 flex justify-center tabular-nums"
             >
-              <path d="M15 3h6v6" />
-              <path d="M10 14 21 3" />
-              <path
-                d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-              />
-            </svg>
-          </a>
-        </li>
-      </ul>
+              {{ index + 1 }}
+            </div>
+            <div class="list-col-grow">
+              <div class="text-xl">{{ page.title }}</div>
+              <div class="text-md opacity-60">
+                {{ page.description }} link : {{ page.link }}
+              </div>
+            </div>
+            <a
+              :href="page.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-square btn-ghost"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-external-link-icon lucide-external-link"
+              >
+                <path d="M15 3h6v6" />
+                <path d="M10 14 21 3" />
+                <path
+                  d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                />
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </transition>
     </UserLayout>
   </div>
 </template>
