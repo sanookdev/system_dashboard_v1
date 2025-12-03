@@ -4,7 +4,7 @@
       <ul class="list bg-base-100 rounded-xl shadow-md">
         <li class="list-row" v-for="(page, index) in downloadList" :key="index">
           <div
-            class="text-4xl w-10 font-thin opacity-30 flex justify-center tabular-nums"
+            class="text-4xl w-10 font-thin opacity-60 flex justify-center tabular-nums"
           >
             {{ index + 1 }}
           </div>

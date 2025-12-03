@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="navbar lg:hidden bg-base-100 shadow-sm">
-      <div class="flex-none">
+    <div class="navbar lg:hidden bg-accent shadow-sm">
+      <div class="flex pl-5 w-full">
         <label class="btn btn-square btn-ghost drawer-button" for="my-drawer-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +18,7 @@
           </svg>
         </label>
       </div>
-      <div class="flex w-full justify-end">
+      <div class="flex w-full">
         <div class="flex items-center">
           <div class="flex lg:hidden items-center gap-2">
             <div class="avatar">
