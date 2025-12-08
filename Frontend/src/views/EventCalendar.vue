@@ -4,13 +4,23 @@
       <div class="font-regular text-2xl">ตารางแสดงกิจกรรมคณะแพทยศาสตร์</div>
       <transition name="fade-scale" mode="out-in" appear>
         <!-- This Calendar -->
-        <div class="calendar-container">
+        <div class="calendar-container relative">
+          <div
+            v-if="isLoading"
+            class="absolute inset-0 flex flex-col justify-center items-center bg-white z-10 rounded-lg"
+          >
+            <span class="loading loading-spinner loading-lg text-accent"></span>
+            <span class="mt-2 text-sm text-gray-500">Loading Calendar...</span>
+          </div>
           <iframe
+            @load="onLoad"
             src="https://calendar.google.com/calendar/embed?src=en.th%23holiday%40group.v.calendar.google.com&ctz=Asia%2FBangkok"
             width="100%"
             height="100%"
             frameborder="0"
             scrolling="no"
+            class="transition-opacity duration-500"
+            :class="{ 'opacity-0': isLoading, 'opacity-100': !isLoading }"
           ></iframe>
         </div>
       </transition>
@@ -19,7 +29,15 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import UserLayout from "@/layouts/UserLayout.vue";
+
+const isLoading = ref(true);
+
+// ฟังก์ชันทำงานเมื่อ iframe โหลดเสร็จ
+const onLoad = () => {
+  isLoading.value = false;
+};
 </script>
 
 <style scoped>
