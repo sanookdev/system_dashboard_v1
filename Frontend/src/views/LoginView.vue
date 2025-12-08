@@ -29,9 +29,9 @@
         </div>
         <div class="text-center">
           <h1 class="text-2xl font-bold text-gray-800 tracking-wide">
-            MED PSU Login
+            MED LOGIN
           </h1>
-          <p class="text-sm text-gray-500 font-light">
+          <p class="text-xl text-gray-500 font-light">
             ระบบสำหรับบุคลากรคณะแพทย์ฯ
           </p>
         </div>
