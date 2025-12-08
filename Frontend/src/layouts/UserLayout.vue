@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="navbar lg:hidden bg-accent shadow-sm">
+    <div class="navbar lg:hidden bg-accent shadow-sm fixed top-0 w-full z-50">
       <div class="flex pl-5 w-full">
         <label class="btn btn-square btn-ghost drawer-button" for="my-drawer-2">
           <svg
@@ -44,7 +44,7 @@
         </div>
       </div>
     </div>
-    <div class="drawer lg:drawer-open">
+    <div class="drawer lg:drawer-open mt-16 lg:mt-0">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content mx-4 my-6">
         <div class="flex justify-between mb-6 px-5">
