@@ -8,6 +8,8 @@ import AdminSystems from "@/views/admin/SystemsView.vue";
 import UserDashboard from "@/views/user/DashboardView.vue";
 import Downloadpage from "@/views/DownloadView.vue"
 import Calendarpage from "@/views/EventCalendar.vue"
+import DownloadpageAdmin from "@/views/admin/DownloadView.vue"
+import CalendarpageAdmin from "@/views/admin/EventCalendar.vue"
 // ✅ import store
 import { useAccountStore } from "@/stores/account";
 const router = createRouter({
@@ -65,6 +67,18 @@ const router = createRouter({
       path: "/eventcalendar",
       name: "event-calendar",
       component: Calendarpage,
+      meta: { title: "Event Calendar", requiresAuth: true, role: ["user", "superadmin", "admin"] }
+    },
+    {
+      path: "/downloadpageAdmin",
+      name: "downloadpageAdmin",
+      component: DownloadpageAdmin,
+      meta: { title: "Download", requiresAuth: true, role: ["superadmin", "admin"] }
+    },
+    {
+      path: "/eventcalendarAdmin",
+      name: "event-calendarAdmin",
+      component: CalendarpageAdmin,
       meta: { title: "Event Calendar", requiresAuth: true, role: ["user", "superadmin", "admin"] }
     },
     {

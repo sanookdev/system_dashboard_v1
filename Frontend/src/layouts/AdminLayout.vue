@@ -232,11 +232,22 @@ onMounted(() => {
 });
 const menus = [
   {
+    name: "Event Calendar",
+    routeName: "event-calendarAdmin",
+    icon: "CalendarDays",
+  },
+  {
     name: "Dashboard",
     routeName: "superadmin-dashboard",
     link: "https://med.tu.ac.th/intra_dashboard",
     icon: "LayoutDashboard",
   },
+  {
+    name: "Download เอกสาร",
+    routeName: "downloadpageAdmin",
+    icon: "download",
+  },
+
   {
     name: "หมวดหมู่",
     routeName: "superadmin-category",
