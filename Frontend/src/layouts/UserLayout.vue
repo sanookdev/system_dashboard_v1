@@ -197,6 +197,11 @@ onMounted(() => {
 });
 const menus = [
   {
+    name: "Event Calendar",
+    routeName: "event-calendar",
+    icon: "CalendarDays",
+  },
+  {
     name: "Dashboard",
     routeName: "user-dashboard",
     icon: "LayoutDashboard",

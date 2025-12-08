@@ -7,6 +7,7 @@ import AdminCategory from "@/views/admin/CategoryView.vue";
 import AdminSystems from "@/views/admin/SystemsView.vue";
 import UserDashboard from "@/views/user/DashboardView.vue";
 import Downloadpage from "@/views/DownloadView.vue"
+import Calendarpage from "@/views/EventCalendar.vue"
 // ✅ import store
 import { useAccountStore } from "@/stores/account";
 const router = createRouter({
@@ -53,11 +54,18 @@ const router = createRouter({
       name: "user-downloadpage",
       component: Downloadpage,
       meta: { title: "Download", requiresAuth: true, role: ["user", "superadmin", "admin"] }
-    }, {
+    },
+    {
       path: "/downloadpage",
       name: "downloadpage",
       component: Downloadpage,
       meta: { title: "Download", requiresAuth: true, role: ["user", "superadmin", "admin"] }
+    },
+    {
+      path: "/eventcalendar",
+      name: "event-calendar",
+      component: Calendarpage,
+      meta: { title: "Event Calendar", requiresAuth: true, role: ["user", "superadmin", "admin"] }
     },
     {
       path: "/login",

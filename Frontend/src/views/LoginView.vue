@@ -119,7 +119,7 @@ const login = async () => {
       router.push({ name: "superadmin-dashboard" });
     }
     if (accountStore.user?.role == "user") {
-      router.push({ name: "user-dashboard" });
+      router.push({ name: "event-calendar" });
     }
   } else {
     loginError.value =
