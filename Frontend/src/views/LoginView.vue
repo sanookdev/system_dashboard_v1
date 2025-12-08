@@ -186,22 +186,170 @@
             />
           </svg>
           <span class="text-left"
-            >หากพบปัญหาการใช้งานติดต่อ<br />งานเทคโนฯ โทร 9700</span
-          >
+            >หากพบปัญหาการใช้งานติดต่อ <br />งานเทคโนฯ โทร 9700
+          </span>
         </div>
 
         <div
           class="flex justify-center gap-6 mt-4 text-sm text-gray-500 font-medium"
         >
-          <a class="hover:text-emerald-600 transition-colors cursor-pointer"
+          <a
+            @click.prevent="openTermsModal"
+            class="hover:text-emerald-600 transition-colors cursor-pointer"
             >เงื่อนไขการให้บริการ</a
           >
-          <a class="hover:text-emerald-600 transition-colors cursor-pointer"
-            >คู่มือการใช้งาน</a
-          >
+          <!-- <a class="hover:text-emerald-600 transition-colors cursor-pointer"
+            >คู่มือการใช้งาน
+          </a> -->
         </div>
       </div>
     </div>
+    <dialog ref="termsModal" class="modal modal-bottom sm:modal-middle">
+      <div
+        class="modal-box bg-white/95 backdrop-blur-md border rounded-4xl border-white/50 shadow-2xl p-0 overflow-hidden flex flex-col max-h-[85vh]"
+      >
+        <div
+          class="bg-gradient-to-r from-emerald-600 to-teal-600 p-5 text-white flex justify-between items-center shrink-0"
+        >
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                />
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg">ข้อกำหนดและเงื่อนไขการใช้งาน</h3>
+          </div>
+          <form method="dialog">
+            <button
+              class="btn btn-circle btn-ghost btn-sm text-white hover:bg-white/20"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <div
+          class="p-6 overflow-y-auto custom-scrollbar text-gray-700 rounded-md leading-relaxed text-sm space-y-4"
+        >
+          <div
+            class="alert bg-blue-50 text-accent border-blue-200 text-md py-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="stroke-current shrink-0 w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <span
+              >โปรดอ่านข้อกำหนดนี้อย่างละเอียดก่อนเข้าใช้งานระบบ Intranet
+              Dashboard</span
+            >
+          </div>
+
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2">
+              1. การเข้าถึงและการยืนยันตัวตน
+            </h4>
+            <p>
+              บัญชีผู้ใช้งาน (User Account) ถือเป็นทรัพย์สินของคณะแพทยศาสตร์
+              ห้ามมิให้ส่งต่อ รหัสผ่าน (Password) ให้แก่ผู้อื่นโดยเด็ดขาด
+              การกระทำใดๆ
+              ภายใต้บัญชีของท่านถือเป็นความรับผิดชอบของเจ้าของบัญชีแต่เพียงผู้เดียว
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2">
+              2. การรักษาความลับข้อมูลนักศึกษาและบุคลากร
+            </h4>
+            <p>
+              ข้อมูลในระบบอาจประกอบด้วยประวัตินักศึกษา ผลการเรียน
+              ข้อมูลทรัพยากรบุคคล และการประเมินต่างๆ ผู้ใช้งานต้องปฏิบัติตาม
+              <span class="font-semibold text-red-600"
+                >พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span
+              >
+              และระเบียบของมหาวิทยาลัยอย่างเคร่งครัด
+            </p>
+            <ul class="list-disc list-inside mt-1 ml-2 text-gray-600">
+              <li>
+                ห้ามแคปหน้าจอ (Screen Capture)
+                หรือเผยแพร่เกรด/เงินเดือน/ข้อมูลส่วนตัว ของผู้อื่น
+              </li>
+              <li>
+                ห้ามนำข้อมูลออกจากระบบเพื่อใช้ในวัตถุประสงค์อื่นนอกเหนือจากการปฏิบัติงาน
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2">3. การใช้งานที่เหมาะสม</h4>
+            <p>
+              ระบบนี้จัดทำขึ้นเพื่อสนับสนุนการปฏิบัติงานภายในคณะฯ เท่านั้น
+              ห้ามใช้เพื่อวัตถุประสงค์ส่วนตัว ธุรกิจ หรือการกระทำที่ผิดกฎหมาย
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2">
+              4. การตรวจสอบ (Auditing & Monitoring)
+            </h4>
+            <p>
+              ระบบจะทำการบันทึกประวัติการเข้าใช้งาน (Log)
+              ของท่านเพื่อประโยชน์ในการตรวจสอบความปลอดภัยและการบริหารจัดการระบบ
+            </p>
+          </div>
+
+          <div class="text-xs text-gray-400 border-t pt-4 mt-6">
+            ปรับปรุงล่าสุด: 8 ธันวาคม 2568
+          </div>
+        </div>
+
+        <div
+          class="p-4 border-t border-gray-100 flex justify-end gap-2 bg-gray-50"
+        >
+          <form method="dialog">
+            <button class="btn btn-neutral btn-sm min-w-[100px]">
+              ปิดหน้าต่าง
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -223,6 +371,15 @@ const userLoginData = reactive({
 const loading = ref(false);
 const loginError = ref("");
 const showPassword = ref(false);
+
+const termsModal = ref(null);
+
+// ฟังก์ชันเปิด Modal
+const openTermsModal = () => {
+  if (termsModal.value) {
+    termsModal.value.showModal();
+  }
+};
 
 const login = async () => {
   loading.value = true;
