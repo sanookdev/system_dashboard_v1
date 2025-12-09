@@ -14,7 +14,7 @@
           </div>
           <iframe
             @load="onLoad"
-            src="https://calendar.google.com/calendar/embed?src=en.th%23holiday%40group.v.calendar.google.com&ctz=Asia%2FBangkok"
+            src="https://calendar.google.com/calendar/embed?src=pr.medicine.thammasat%40gmail.com&ctz=Asia%2FBangkok"
             width="100%"
             height="100%"
             frameborder="0"
