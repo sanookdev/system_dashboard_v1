@@ -139,8 +139,8 @@ module.exports = {
           },
         ],
         order: [
-          ["name", "ASC"],
-          [{ model: System, as: "systems" }, "name", "ASC"],
+          ["id", "ASC"],
+          [{ model: System, as: "systems" }, "id", "ASC"],
         ],
         subQuery: false,
       });
