@@ -57,6 +57,25 @@
                 </option>
               </select>
             </div>
+            <div class="flex flex-col">
+              <div class="label">SSO TOKEN</div>
+              <select v-model="systemForm.sso" class="select select-bordered">
+                <option disabled value="">SSO-TOKEN</option>
+                <option value="true">YES</option>
+                <option value="false">NO</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <div class="label">SSO CODE</div>
+              <select
+                v-model="systemForm.sso_code"
+                class="select select-bordered"
+              >
+                <option disabled value="">SSO-CODE</option>
+                <option value="true">YES</option>
+                <option value="false">NO</option>
+              </select>
+            </div>
           </div>
           <div class="flex flex-col">
             <div class="label">รายละเอียด</div>
@@ -123,7 +142,7 @@
           ระบบงานทั้งหมด
         </div>
         <Table
-          :headers="['icon', 'name', 'category', 'url']"
+          :headers="['icon', 'name', 'category', 'url', 'sso', 'sso_code']"
           :rows="systems"
           :edit_button="true"
           :delete_button="true"
@@ -145,14 +164,11 @@ import AdminLayout from "@/layouts/AdminLayout.vue";
 import Table from "@/components/Table.vue";
 import { useSystemsStore } from "@/stores/superadmin/systems";
 import { useCategoriesStore } from "@/stores/superadmin/categories";
-import { useAccountStore } from "@/stores/account";
-import * as lucideIcons from "lucide-vue-next";
 
 const { proxy } = getCurrentInstance();
 const router = useRouter();
 const systemsStore = useSystemsStore();
 const categoriesStore = useCategoriesStore();
-const accountStore = useAccountStore();
 
 const systems = computed(() => systemsStore.list);
 const categories = computed(() => categoriesStore.list);
@@ -167,6 +183,8 @@ const systemForm = ref({
   owner_department: "",
   description: "",
   category_id: "",
+  sso: "",
+  sso_code: "",
 });
 
 const isEditMode = ref(false);
@@ -197,6 +215,7 @@ onMounted(async () => {
 });
 
 const onEdit = (row) => {
+  isEditMode.value = true;
   systemForm.value = {
     id: row.id,
     name: row.name,
@@ -205,8 +224,10 @@ const onEdit = (row) => {
     owner_department: row.owner_department || "",
     description: row.description || "",
     category_id: row.category_id || "",
+    sso: row.sso,
+    sso_code: row.sso_code,
   };
-  isEditMode.value = true;
+  console.log(systemForm.value);
 };
 
 const onDelete = (row) => {
@@ -254,6 +275,8 @@ const onSubmit = async () => {
     owner_department: systemForm.value.owner_department,
     description: systemForm.value.description,
     category_id: systemForm.value.category_id,
+    sso: systemForm.sso,
+    sso_code: systemForm.sso_code,
   };
 
   let result;
@@ -279,6 +302,8 @@ const clearSystemForm = () => {
     owner_department: "",
     description: "",
     category_id: "",
+    sso: "",
+    sso_code: "",
   };
   isEditMode.value = false;
 };

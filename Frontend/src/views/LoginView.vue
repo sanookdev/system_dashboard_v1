@@ -350,15 +350,56 @@
         <button>close</button>
       </form>
     </dialog>
+    <div v-if="toast.show" class="toast toast-bottom toast-center z-50">
+      <div
+        class="alert shadow-lg transition-all duration-300 ease-in-out transform"
+        :class="{
+          'alert-success text-white': toast.type === 'success',
+          'alert-info text-white': toast.type === 'info',
+          'alert-error text-white': toast.type === 'error',
+        }"
+      >
+        <svg
+          v-if="toast.type === 'success'"
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <svg
+          v-if="toast.type === 'info'"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          class="stroke-current shrink-0 w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <span>{{ toast.message }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 // ... (ใช้ Script เดิมได้เลยครับ ไม่ต้องแก้) ...
 console.log("ENV : ", import.meta.env);
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { reactive, ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
+const route = useRoute();
 
 import { useAccountStore } from "@/stores/account";
 const accountStore = useAccountStore();
@@ -373,6 +414,36 @@ const loginError = ref("");
 const showPassword = ref(false);
 
 const termsModal = ref(null);
+
+// ✅ 1. สร้าง State สำหรับ Toast
+const toast = reactive({
+  show: false,
+  message: "",
+  type: "success", // success, info, error
+});
+
+// ✅ 2. ฟังก์ชันเรียกใช้ Toast
+const showToast = (message, type = "success", duration = 3000) => {
+  toast.message = message;
+  toast.type = type;
+  toast.show = true;
+
+  // ซ่อนอัตโนมัติตามเวลาที่กำหนด
+  setTimeout(() => {
+    toast.show = false;
+  }, duration);
+};
+
+// ✅ 3. เช็คสถานะ Logout ตอนโหลดหน้าจอ
+onMounted(() => {
+  // ถ้ามีการ Redirect มาพร้อม query ?action=logout (ต้องไปแก้ปุ่ม logout ที่หน้าอื่นให้ส่งมาแบบนี้)
+  if (route.query.action === "logout") {
+    showToast("ออกจากระบบเรียบร้อยแล้ว", "info");
+
+    // (Optional) ล้าง query param ออกเพื่อให้ URL สวยงาม
+    router.replace({ query: null });
+  }
+});
 
 // ฟังก์ชันเปิด Modal
 const openTermsModal = () => {
@@ -397,15 +468,18 @@ const login = async () => {
   console.log(accountStore.user);
 
   if (accountStore.response.status) {
-    if (
-      accountStore.user?.role == "admin" ||
-      accountStore.user?.role == "superadmin"
-    ) {
-      router.push({ name: "superadmin-dashboard" });
-    }
-    if (accountStore.user?.role == "user") {
-      router.push({ name: "event-calendar" });
-    }
+    // ✅ 4. กรณี Login สำเร็จ: แสดง Toast ก่อนย้ายหน้า
+    showToast("เข้าสู่ระบบสำเร็จ...", "success");
+    setTimeout(() => {
+      if (
+        accountStore.user?.role == "admin" ||
+        accountStore.user?.role == "superadmin"
+      ) {
+        router.push({ name: "superadmin-dashboard" });
+      } else if (accountStore.user?.role == "user") {
+        router.push({ name: "event-calendar" });
+      }
+    }, 1000);
   } else {
     loginError.value =
       accountStore.response?.message || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";

@@ -211,7 +211,7 @@ watchEffect(() => {
 
 const logout = async () => {
   await accountStore.logout();
-  router.push({ name: "login" });
+  router.push({ name: "login", query: { action: "logout" } });
 };
 // --- ดึงรูปจาก API (แบบไฟล์รูป/Blob)
 async function loadAvatar(username) {

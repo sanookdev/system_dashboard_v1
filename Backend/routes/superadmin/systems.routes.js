@@ -5,9 +5,7 @@ const { check, validationResult } = require("express-validator");
 const {
   verifyToken,
   isInRole,
-  setUser,
   verifyApplicationKey,
-  refreshToken,
 } = require("../../middleware/security.js");
 
 router.get("/", (req, res) => {

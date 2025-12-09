@@ -52,6 +52,7 @@ router.post(
 
 router.put("/:id", verifyApplicationKey, verifyToken, async (req, res) => {
   try {
+    // return res.json(req.body)
     req.body.updated_by = req.user.username;
     req.body.updated_at = new Date();
     console.log(req.body.updated_at + 7);

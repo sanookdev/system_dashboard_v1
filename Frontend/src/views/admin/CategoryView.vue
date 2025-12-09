@@ -16,6 +16,13 @@
                   class="input input-bordered"
                 />
               </div>
+              <div>
+                <select class="select" v-model="categoryForm.public">
+                  <option value="" disabled selected>Status</option>
+                  <option value="1">Public</option>
+                  <option value="0">Unpublic</option>
+                </select>
+              </div>
               <div class="flex">
                 <div>
                   <button class="btn btn-success">
@@ -34,7 +41,13 @@
       </div>
       <div v-if="categories.length">
         <Table
-          :headers="['name', 'created_at', 'created_by', 'updated_at']"
+          :headers="[
+            'name',
+            'created_at',
+            'created_by',
+            'updated_at',
+            'public',
+          ]"
           :rows="categories"
           :edit_button="true"
           :delete_button="true"
@@ -49,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, getCurrentInstance } from "vue";
+import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import { useCategoriesStore } from "@/stores/superadmin/categories";
@@ -64,7 +77,7 @@ const categoriesStore = useCategoriesStore();
 
 const categories = computed(() => categoriesStore.list);
 
-const categoryForm = ref({ id: null, name: "" });
+const categoryForm = ref({ id: null, name: "", public: "" });
 const isEditMode = ref(false);
 
 onMounted(async () => {
@@ -85,7 +98,7 @@ onMounted(async () => {
 });
 
 const onEdit = (row) => {
-  categoryForm.value = { id: row.id, name: row.name };
+  categoryForm.value = { id: row.id, name: row.name, public: row.public };
   isEditMode.value = true;
 };
 
@@ -110,10 +123,12 @@ const onSubmit = async () => {
   if (isEditMode.value) {
     result = await categoriesStore.updateCategory(categoryForm.value.id, {
       name: categoryForm.value.name,
+      public: categoryForm.value.public,
     });
   } else {
     result = await categoriesStore.createCategory({
       name: categoryForm.value.name,
+      public: categoryForm.value.public,
     });
   }
 
@@ -125,7 +140,7 @@ const onSubmit = async () => {
 };
 
 const clearCategoryForm = () => {
-  categoryForm.value = { id: null, name: "" };
+  categoryForm.value = { id: null, name: "", public: "" };
   isEditMode.value = false;
 };
 </script>

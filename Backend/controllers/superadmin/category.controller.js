@@ -21,7 +21,9 @@ module.exports = {
               "created_by",
               "updated_at",
               "img_icon",
-              "sso"
+              "sso",
+              "sso_code",
+              "public"
             ],
           },
           {
@@ -34,6 +36,19 @@ module.exports = {
       return { status: true, categories };
     } catch (error) {
       console.error("findAll error", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      };
+    }
+  },
+  async findAllCategory() {
+    try {
+      const categories = await Category.findAll();
+      return { status: true, categories };
+    } catch (error) {
+      console.error("findAllCategory error", error);
       return {
         status: false,
         message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",

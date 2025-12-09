@@ -41,15 +41,16 @@ module.exports = {
               "updated_at",
               "img_icon",
               "sso",
-              "sso_code"
+              "sso_code",
+              "public"
             ],
             include: [
               {
                 model: SystemPermission,
                 as: "systemPermissions",
                 required: false,
-                where: { employee_code },
-                attributes: [],
+                where: { employee_code: employee_code },
+                attributes: ["employee_code"],
               },
             ],
           },
@@ -62,22 +63,31 @@ module.exports = {
       });
 
       // ====== Logic หลังดึงมา ======
-      categories.map((cat) => {
+      const result = categories.map((cat) => {
         const c = cat.toJSON();
 
-        const systems =
-          c.public === 1
-            ? c.systems || [] // public = 1 → แสดงทุกระบบ
-            : (c.systems || []).filter(
-              (sys) => (sys.systemPermissions || []).length > 0
-            ); // public = 0 → แสดงเฉพาะระบบที่มีสิทธิ์
+        // กรอง systems ตามเงื่อนไขใหม่
+        const systems = (c.systems || []).filter((sys) => {
+          // เงื่อนไขที่ 1: ถ้า System เป็น Public (1) -> ให้แสดงได้เลย
+          if (sys.public === 1) {
+            return true;
+          }
 
-        // public = 0 แต่มี CategoryPermission ก็ต้องโชว์แม้ไม่มี systems
+          // เงื่อนไขที่ 2: ถ้า System ไม่ใช่ Public (0) -> ต้องมี permission
+          // เราเช็คจาก systemPermissions ที่ join มา ถ้ามีข้อมูล (length > 0) แปลว่า user นี้มีสิทธิ์
+          if (sys.systemPermissions && sys.systemPermissions.length > 0) {
+            return true;
+          }
+
+          // นอกเหนือจากนี้ (ไม่ public และ ไม่มีสิทธิ์) -> ไม่แสดง
+          return false;
+        });
+
         return {
           id: c.id,
           name: c.name,
           public: c.public,
-          systems,
+          systems: systems, // ส่ง systems ที่กรองแล้วกลับไป
         };
       });
       return { status: true, result };
@@ -92,46 +102,37 @@ module.exports = {
   },
   async findAllByEmployee(employee_code) {
     try {
-
+      // 1. Query DB (ส่วนนี้ถูกต้องแล้วครับ ใช้ include แบบ required: false)
       const categories = await Category.findAll({
         attributes: ["id", "name", "public"],
         where: {
-          // ✅ เลือก category จาก 2 เงื่อนไขนี้เท่านั้น
           [Op.or]: [
-            { public: 1 },                              // public เห็นได้ทุกคน
-            { "$permissions.employee_code$": employee_code }, // private แต่ user มีสิทธิ์
+            { public: 1 },
+            { "$permissions.employee_code$": employee_code },
           ],
         },
         include: [
           {
             model: CategoryPermission,
             as: "permissions",
-            required: false,        // ❗ ต้อง false
+            required: false,
             attributes: [],
           },
           {
             model: System,
             as: "systems",
-            required: false,        // ❗ ตรงนี้สำคัญสุด ถ้า true category ที่ไม่มี system จะหาย
+            required: false,
             attributes: [
-              "id",
-              "icon",
-              "name",
-              "description",
-              "url",
-              "owner_department",
-              "created_at",
-              "created_by",
-              "updated_at",
-              "img_icon",
-              "sso",
-              "sso_code"
+              "id", "icon", "name", "description", "url",
+              "owner_department", "created_at", "created_by",
+              "updated_at", "img_icon", "sso", "sso_code", "public"
             ],
             include: [
               {
                 model: SystemPermission,
                 as: "systemPermissions",
-                required: false,    // ใช้ไว้ filter ทีหลัง
+                required: false,
+                where: { employee_code: employee_code }, // ดึง Permission ของเรามาเตรียมไว้ (ถ้ามี)
                 attributes: ["employee_code"],
               },
             ],
@@ -144,21 +145,29 @@ module.exports = {
         subQuery: false,
       });
 
-      // =========== จัดรูปผลลัพธ์ตาม rule ===========
-
-      const results = await categories.map((cat) => {
+      const results = categories.map((cat) => {
         const c = cat.toJSON();
 
-        // public = 1 → เอาทุก system
-        // public = 0 → เอาเฉพาะ system ที่ user มี system_permission
-        const systems =
-          c.public === 1
-            ? (c.systems || [])
-            : (c.systems || []).filter((sys) =>
-              (sys.systemPermissions || []).some(
-                (sp) => sp.employee_code === employee_code
-              )
-            );
+        // เราจะไม่เช็ค c.public (หมวดหมู่) เพื่อเหมา systems 
+        // แต่จะเจาะจงเช็คทีละ system เลย เพื่อความชัวร์และถูกต้อง
+        const systems = (c.systems || []).filter((sys) => {
+
+          // ✅ 1. ถ้า Public = 1 "ดึงมาเลย" (ตามที่คุณต้องการ)
+          // จบตรงนี้เลย ไม่ต้องไปเช็ค permission ต่อ
+
+          if (sys.public) {
+            return true;
+          }
+
+          // ✅ 2. ถ้า Public = 0 ค่อยมาเช็ค Permission
+          // ถ้ามีข้อมูลใน systemPermissions (ที่ join มา) แปลว่ามีสิทธิ์
+          if (sys.systemPermissions && sys.systemPermissions.length > 0) {
+            return true;
+          }
+
+          // ❌ 3. ถ้าไม่เข้าเงื่อนไขบนเลย แสดงว่าไม่มีสิทธิ์
+          return false;
+        });
 
         return {
           id: c.id,
@@ -169,6 +178,7 @@ module.exports = {
       });
 
       return { status: true, categories: results };
+
     } catch (error) {
       console.error("findAllByEmployee error", error);
       return {
