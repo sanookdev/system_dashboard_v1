@@ -167,7 +167,7 @@
         </button>
       </form>
 
-      <div class="mt-8 pt-6 border-t border-gray-200/60 text-center">
+      <div class="mt-4 pt-6 border-t border-gray-200/60 text-center">
         <div
           class="flex items-start justify-center gap-2 text-xs text-orange-600 bg-orange-50 p-3 rounded-lg border border-orange-100"
         >
@@ -198,9 +198,12 @@
             class="hover:text-emerald-600 transition-colors cursor-pointer"
             >เงื่อนไขการให้บริการ</a
           >
-          <!-- <a class="hover:text-emerald-600 transition-colors cursor-pointer"
-            >คู่มือการใช้งาน
-          </a> -->
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSdsCb-OlSDB4i7yWLvIsBzrJh2eJATVsbU4Pm9B7DOrCTZhcw/viewform?usp=sharing&ouid=104571451642350975963"
+            target="_blank"
+            class="hover:text-emerald-600 transition-colors cursor-pointer"
+            >แบบประเมินความพึงพอใจ
+          </a>
         </div>
       </div>
     </div>
