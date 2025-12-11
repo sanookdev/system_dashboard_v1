@@ -110,7 +110,8 @@ router.get(
       });
     }
   }
-); router.get(
+);
+router.get(
   "/authenticate/sso",
   verifyApplicationKey,
   verifyToken,

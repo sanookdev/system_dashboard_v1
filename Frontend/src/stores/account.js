@@ -108,7 +108,7 @@ export const useAccountStore = defineStore("account", {
       }
     },
     async logout() {
-      await this.clearStorage();
+      this.clearStorage();
       this.isLoggedIn = false;
       this.user = {};
       this.token = null;

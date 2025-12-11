@@ -8,7 +8,7 @@
             <div class="text-accent">{{ systems.length }} ระบบ</div>
           </div>
           <div class="w-auto md:w-100">
-            <label class="input input-bordered flex items-center gap-2 h-10">
+            <div class="input input-bordered flex items-center gap-2 h-10">
               <input
                 type="text"
                 class="grow w-full max-w-xs"
@@ -16,7 +16,7 @@
                 v-model="searchQuery"
               />
               <Search class="w-4 h-4 opacity-70" />
-            </label>
+            </div>
           </div>
         </div>
         <div class="hidden md:flex items-center gap-4">
@@ -95,6 +95,7 @@
                 >
                   <img
                     v-if="system.img_icon"
+                    :alt="system.name"
                     :src="`${basePath}${system.img_icon}`"
                     class="inline-block w-6 h-6 mr-2 object-contain"
                   />
@@ -194,15 +195,13 @@ const openSubsystemCode = async (system) => {
         ssoResponse?.message || "ไม่สามารถยืนยันสิทธิ์เข้าใช้ระบบย่อยได้"
       );
     } else {
-      if (ssoResponse.status) {
-        console.log(ssoResponse);
-        console.log("sso pass");
-        const redirect_to_subsystem = system.sso
-          ? `${system_url}${ssoResponse.query}`
-          : system_url;
-        console.log(redirect_to_subsystem);
-        window.open(redirect_to_subsystem, "_blank");
-      }
+      console.log(ssoResponse);
+      console.log("sso pass");
+      const redirect_to_subsystem = system.sso
+        ? `${system_url}${ssoResponse.query}`
+        : system_url;
+      console.log(redirect_to_subsystem);
+      window.open(redirect_to_subsystem, "_blank");
     }
   } catch (error) {
     console.error(error);

@@ -13,6 +13,7 @@
                 v-if="subsystem.img_icon"
                 :src="`${basePath}${subsystem.img_icon}`"
                 class="w-20 h-20 p-4"
+                :alt="subsystem.name"
               />
 
               <component

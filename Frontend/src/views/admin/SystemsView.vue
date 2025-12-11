@@ -88,7 +88,7 @@
 
           <!-- ✅ Icon Picker -->
           <div>
-            <label class="font-semibold block mb-2">เลือกไอคอน: </label>
+            <div class="font-semibold block mb-2">เลือกไอคอน:</div>
             <div class="flex flex-col md:flex-row gap-10">
               <div
                 class="grid lg:grid-cols-8 md:grid-cols-6 grid-cols-4 gap-2 max-h-[200px] lg:max-w-[70%] overflow-y-auto bg-white p-4 border my-4 md:my-0"
@@ -281,7 +281,6 @@ const onSubmit = async () => {
 
   let result;
   if (isEditMode.value) {
-    // console.log(payload);
     result = await systemsStore.updateSystem(systemForm.value.id, payload);
   } else {
     result = await systemsStore.createSystem(payload);

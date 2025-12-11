@@ -61,11 +61,11 @@
 
       <form @submit.prevent="login" class="space-y-5">
         <div class="form-control">
-          <label class="label">
+          <div class="label">
             <span class="label-text font-semibold text-gray-600 ml-1"
               >Username</span
             >
-          </label>
+          </div>
           <label
             class="input input-bordered w-full flex items-center gap-3 bg-white/70 hover:bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-success/50 transition-all duration-300 rounded-xl shadow-sm"
           >
@@ -90,12 +90,12 @@
         </div>
 
         <div class="form-control">
-          <label class="label">
+          <div class="label">
             <span class="label-text font-semibold text-gray-600 ml-1"
               >Password</span
             >
-          </label>
-          <label
+          </div>
+          <div
             class="input input-bordered w-full flex items-center gap-3 bg-white/70 hover:bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-success/50 transition-all duration-300 rounded-xl shadow-sm"
           >
             <svg
@@ -158,7 +158,7 @@
                 />
               </svg>
             </button>
-          </label>
+          </div>
         </div>
 
         <button

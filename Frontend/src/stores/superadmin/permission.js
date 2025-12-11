@@ -57,7 +57,6 @@ export const usePermissionStore = defineStore("permission", {
         };
         console.error("createPermission error:", error);
         return error;
-        if (error?.response?.data) return error.response.data;
       }
     },
     async clearPermissionList() {

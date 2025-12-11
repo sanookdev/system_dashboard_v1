@@ -6,7 +6,7 @@
           <div class="label">จำนวนระบบทั้งหมด :</div>
           <div class="text-accent">{{ systems.length }} ระบบ</div>
         </div>
-        <label class="input input-bordered flex items-center gap-2 h-10">
+        <div class="input input-bordered flex items-center gap-2 h-10">
           <input
             type="text"
             class="grow w-full max-w-xs"
@@ -14,7 +14,7 @@
             v-model="searchQuery"
           />
           <Search class="w-4 h-4 opacity-70" />
-        </label>
+        </div>
         <div class="hidden md:flex items-center gap-4">
           <div
             class="bg-accent rounded-xl p-2 cursor-pointer"
@@ -84,6 +84,7 @@
                   <img
                     v-if="system.img_icon"
                     :src="`${basePath}${system.img_icon}`"
+                    :alt="system.name"
                     class="inline-block w-6 h-6 mr-2 object-contain"
                   />
                   <component

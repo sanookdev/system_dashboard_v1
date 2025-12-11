@@ -13,12 +13,11 @@
             <span class="mt-2 text-sm text-gray-500">Loading Calendar...</span>
           </div>
           <iframe
+            title="Pr Medicine Calendar"
             @load="onLoad"
             src="https://calendar.google.com/calendar/embed?src=pr.medicine.thammasat%40gmail.com&ctz=Asia%2FBangkok"
             width="100%"
             height="100%"
-            frameborder="0"
-            scrolling="no"
             class="transition-opacity duration-500"
             :class="{ 'opacity-0': isLoading, 'opacity-100': !isLoading }"
           ></iframe>

@@ -24,7 +24,7 @@
             <div class="avatar">
               <div class="rounded-full overflow-hidden">
                 <div class="w-10 object-cover object-top">
-                  <img :src="avatarUrl" />
+                  <img :src="avatarUrl" alt="" />
                 </div>
               </div>
             </div>
@@ -48,29 +48,6 @@
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content mx-4 my-6">
         <div class="flex justify-between mb-6 px-5">
-          <!-- <div>
-            <div class="input rounded-full w-[150%] shadow-sm border-none">
-              <span class="sr-only"></span>
-              <svg
-                class="h-[1em] opacity-50"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <g
-                  stroke-linejoin="round"
-                  stroke-linecap="round"
-                  stroke-width="2.5"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </g>
-              </svg>
-              <input type="search" class="grow" placeholder="Search" />
-            </div>
-          </div> -->
-          <div></div>
           <div class="hidden lg:flex items-center gap-2">
             <div class="avatar">
               <div
@@ -98,20 +75,6 @@
             </div>
           </div>
         </div>
-        <!-- DEBUG TOKEN -->
-        <!-- <div>
-          <div class="flex flex-col border-[2px] p-3">
-            <div class="flex-1 font-bold">TOKEN :</div>
-            <div class="text-sm overflow-auto whitespace-nowrap w-full">
-              <div>{{ accountStore.token }}</div>
-              <div class="divider"></div>
-              <div class="font-bold">TOKEN IN STORAGE:</div>
-              <div>
-                {{ tokenInStorage }}
-              </div>
-            </div>
-          </div>
-        </div> -->
         <div class="bg-gray-100 rounded-3xl mx-4 px-10 py-10 my-10">
           <div class="grid grid-cols-1 gap-6">
             <div class="font-semibold text-3xl">{{ route.meta.title }}</div>

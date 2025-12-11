@@ -9,7 +9,7 @@
           <form @submit.prevent="onSubmit" class="flex gap-2 items-center">
             <div class="flex flex-col gap-2 md:flex-row">
               <div>
-                <label class="label text-sm">รหัสพนักงาน</label>
+                <div class="label text-sm">รหัสพนักงาน</div>
                 <input
                   v-model="permissionForm.employee_code"
                   type="text"
@@ -18,7 +18,7 @@
                 />
               </div>
               <div>
-                <label class="label text-sm" for="role">ระบบ</label>
+                <div class="label text-sm">ระบบ</div>
                 <select
                   v-model="permissionForm.system_id"
                   class="select select-bordered"
@@ -34,7 +34,7 @@
                 </select>
               </div>
               <div>
-                <label class="label text-sm">กำหนดสิทธิ์</label>
+                <div class="label text-sm">กำหนดสิทธิ์</div>
                 <select
                   v-model="permissionForm.isAdmin"
                   class="select select-bordered"
