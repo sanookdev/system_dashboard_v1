@@ -9,11 +9,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   'http://172.17.1.250:5173',
   "https://med.tu.ac.th",
-  "https://med.tu.ac.th/intra_dashboard",
-  "http://203.131.209.137/main/income_display",
   "http://203.131.209.137",
   "https://student.med.tu.ac.th",
-  "https://student.med.tu.ac.th/serviceTechno",
 ];
 
 app.use(cors({

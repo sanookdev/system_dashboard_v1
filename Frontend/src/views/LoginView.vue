@@ -201,6 +201,7 @@
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSdsCb-OlSDB4i7yWLvIsBzrJh2eJATVsbU4Pm9B7DOrCTZhcw/viewform?usp=sharing&ouid=104571451642350975963"
             target="_blank"
+            rel="noopener noreferrer"
             class="hover:text-emerald-600 transition-colors cursor-pointer"
             >แบบประเมินความพึงพอใจ
           </a>
