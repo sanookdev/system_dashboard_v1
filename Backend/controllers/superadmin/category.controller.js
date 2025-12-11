@@ -81,7 +81,6 @@ module.exports = {
     try {
       const found = await Category.findByPk(id);
       if (!found) return { status: false, message: "ไม่พบข้อมูล" };
-
       await Category.destroy({ where: { id } });
       return { status: true, message: "ลบหมวดหมู่เรียบร้อยแล้ว" };
     } catch (error) {

@@ -75,12 +75,8 @@ module.exports = {
 
           // เงื่อนไขที่ 2: ถ้า System ไม่ใช่ Public (0) -> ต้องมี permission
           // เราเช็คจาก systemPermissions ที่ join มา ถ้ามีข้อมูล (length > 0) แปลว่า user นี้มีสิทธิ์
-          if (sys.systemPermissions && sys.systemPermissions.length > 0) {
-            return true;
-          }
 
-          // นอกเหนือจากนี้ (ไม่ public และ ไม่มีสิทธิ์) -> ไม่แสดง
-          return false;
+          return sys.systemPermissions && sys.systemPermissions.length > 0;
         });
 
         return {
@@ -161,12 +157,7 @@ module.exports = {
 
           // ✅ 2. ถ้า Public = 0 ค่อยมาเช็ค Permission
           // ถ้ามีข้อมูลใน systemPermissions (ที่ join มา) แปลว่ามีสิทธิ์
-          if (sys.systemPermissions && sys.systemPermissions.length > 0) {
-            return true;
-          }
-
-          // ❌ 3. ถ้าไม่เข้าเงื่อนไขบนเลย แสดงว่าไม่มีสิทธิ์
-          return false;
+          return sys.systemPermissions && sys.systemPermissions.length > 0;
         });
 
         return {

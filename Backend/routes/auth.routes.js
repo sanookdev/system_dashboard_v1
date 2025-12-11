@@ -118,7 +118,6 @@ router.get(
   async (req, res) => {
     try {
       let user = await decodeToken(req.headers["authorization"]);
-      let authorize = await authController.authorizeSystem(user.username);
       res.json({
         status: true,
         message: "Token is valid!",
@@ -143,7 +142,7 @@ router.get(
   verifyToken,
   async (req, res) => {
     try {
-      let user = await decodeToken(req.headers["authorization"]);
+      await decodeToken(req.headers["authorization"]);
     } catch (error) {
       res.status(500).json({
         status: false,
@@ -158,35 +157,9 @@ router.get("/callback", async (req, res) => {
   try {
     const { code, state } = req.query || {};
     if (!code || !state) return res.status(400).send("missing code or state");
-    // TODO: validate state ถ้าคุณ generate ตอนก่อนออกจาก dashboard/FE
 
     return res.status(200).json({ code: code, state: state })
 
-    const r = await axios.post(
-      "https://dashboard.example.com/auth/introspect",
-      { code, system_id: 7 },
-      { headers: { "Application-Key": process.env.APP_KEY } }
-    );
-
-    if (!r.data?.status) return res.status(401).send("Unauthorized");
-
-    // สร้าง session ภายใน System A
-    const sessionId = await createSessionFor(r.data.user, {
-      isAdmin: r.data.isAdmin,
-      roles: r.data.roles,
-      perms: r.data.perms,
-      exp: r.data.exp
-    });
-
-    res.cookie("sa_session", sessionId, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None", // ถ้าข้ามโดเมนย่อย
-      path: "/",
-      maxAge: 60 * 60 * 1000
-    });
-
-    return res.redirect("/");
   } catch (err) {
     return res.status(500).send("callback error");
   }

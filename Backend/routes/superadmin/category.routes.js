@@ -80,9 +80,4 @@ router.delete("/:id", verifyApplicationKey, verifyToken, async (req, res) => {
   }
 });
 
-// router.post("/import", upload.single("file"), async (req, res) => {
-//   const result = await controller.importExcel(req.file);
-//   return res.status(result.status ? 200 : 500).json(result);
-// });
-
 module.exports = router;

@@ -106,6 +106,6 @@ router.delete("/:id", verifyApplicationKey, verifyToken, async (req, res) => {
     });
   }
 });
-// router.delete("/:id", systemController.remove);
+
 
 module.exports = router;

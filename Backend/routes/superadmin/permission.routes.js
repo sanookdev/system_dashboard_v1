@@ -37,7 +37,7 @@ router.post(
       const employee_code = req.body.employee_code;
       req.body.employee_code = employee_code.toUpperCase();
       const result = await permissionController.create(req.body);
-      res.status(result.status ? 201 || result.status_code : 500).json(result);
+      res.status(result.status ? (result.status_code || 201) : 500).json(result);
     } catch (error) {
       return res.status(500).json({
         status: false,

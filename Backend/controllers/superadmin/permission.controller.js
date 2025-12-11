@@ -76,11 +76,6 @@ module.exports = {
 
       await SystemPermission.update({ isAdmin: isAdmin, updated_by: updated_by }, { where: { ...whereObj } });
       return { status: true, message: "อัปเดตสำเร็จ" };
-      return {
-        employee_code: employee_code,
-        isAdmin: isAdmin,
-        system_id: isAdmin
-      }
     } catch (error) {
       return {
         status: false,
