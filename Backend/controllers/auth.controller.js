@@ -1,4 +1,5 @@
-const { User, employeeAuth, SystemPermission, System, Category, LoginLog } = require("../models");
+
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog, sequelize } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -8,6 +9,8 @@ dotenv.config();
 const recordLoginLog = async (username) => {
   try {
     const now = new Date();
+
+
     // ค้นหา username ถ้าไม่เจอให้สร้างใหม่ (created_at, lastlogin_at เป็นเวลาปัจจุบัน)
     const [log, created] = await LoginLog.findOrCreate({
       where: { username: username },

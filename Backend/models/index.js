@@ -7,6 +7,7 @@ const commonOptions = {
   dialect: "mysql",
   timezone: "+07:00",            // ✅ ใช้ที่นี่พอ
   dialectOptions: {
+    timezone: "+07:00",
     dateStrings: true,           // ✅ อ่าน DATETIME เป็นสตริงตามโซน
     typeCast: true,
   },
