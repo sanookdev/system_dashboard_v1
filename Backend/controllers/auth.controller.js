@@ -1,11 +1,35 @@
-const { User, employeeAuth, SystemPermission, System, Category } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const recordLoginLog = async (username) => {
+  try {
+    const now = new Date();
+    // ค้นหา username ถ้าไม่เจอให้สร้างใหม่ (created_at, lastlogin_at เป็นเวลาปัจจุบัน)
+    const [log, created] = await LoginLog.findOrCreate({
+      where: { username: username },
+      defaults: {
+        username: username,
+        created_at: now,
+        lastlogin_at: now
+      }
+    });
+
+    // ถ้ามีอยู่แล้ว (ไม่ได้ create ใหม่) ให้อัปเดต lastlogin_at
+    if (!created) {
+      await log.update({ lastlogin_at: now });
+    }
+  } catch (error) {
+    console.error("Error recording login log:", error.message);
+    // ไม่ throw error เพื่อให้ user ยัง login ได้แม้ log จะพัง
+  }
+};
+
 module.exports = {
+
   // Get all access systems of username
   async authorizeSystem(username) {
     try {
@@ -108,6 +132,10 @@ module.exports = {
         };
       }
 
+      // ✅ บันทึก  log
+
+      await recordLoginLog(user.username);
+
       // ✅ สร้าง token
       const token = jwt.sign(
         {
@@ -156,6 +184,7 @@ module.exports = {
           message: "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง",
         };
       }
+      await recordLoginLog(user.username);
 
       // ✅ สร้าง token
       const token = jwt.sign(

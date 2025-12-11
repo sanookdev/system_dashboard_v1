@@ -82,6 +82,8 @@ db.CategoryPermission.belongsTo(db.Category, {
   as: "category",
 });
 
+db.LoginLog = require("./login_log")(sequelize, DataTypes);
+
 // AUTH DB
 db.employeeAuth = require("./employee_auth.model")(userDB, DataTypes);
 // (END) AUTH DB
