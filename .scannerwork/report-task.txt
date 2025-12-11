@@ -2,5 +2,5 @@ projectKey=system_dashboard
 serverUrl=http://localhost:9000
 serverVersion=10.6.0.92116
 dashboardUrl=http://localhost:9000/dashboard?id=system_dashboard
-ceTaskId=064fce4b-6f8b-4ab4-9e91-826da972f623
-ceTaskUrl=http://localhost:9000/api/ce/task?id=064fce4b-6f8b-4ab4-9e91-826da972f623
+ceTaskId=3cc99678-b029-45f8-9dd5-85f0c6b2a876
+ceTaskUrl=http://localhost:9000/api/ce/task?id=3cc99678-b029-45f8-9dd5-85f0c6b2a876

@@ -83,6 +83,7 @@
               type="text"
               class="grow placeholder:text-gray-400 text-gray-700 text-base"
               v-model="userLoginData.username"
+              :disabled="loading"
               placeholder="MEDCODE (รหัสพนักงาน)"
             />
           </label>
@@ -110,6 +111,7 @@
               />
             </svg>
             <input
+              :disabled="loading"
               :type="showPassword ? 'text' : 'password'"
               class="grow placeholder:text-gray-400 text-gray-700 text-base"
               v-model="userLoginData.password"
