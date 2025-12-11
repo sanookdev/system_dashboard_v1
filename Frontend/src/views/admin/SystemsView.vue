@@ -275,12 +275,13 @@ const onSubmit = async () => {
     owner_department: systemForm.value.owner_department,
     description: systemForm.value.description,
     category_id: systemForm.value.category_id,
-    sso: systemForm.sso,
-    sso_code: systemForm.sso_code,
+    sso: systemForm.value.sso,
+    sso_code: systemForm.value.sso_code,
   };
 
   let result;
   if (isEditMode.value) {
+    // console.log(payload);
     result = await systemsStore.updateSystem(systemForm.value.id, payload);
   } else {
     result = await systemsStore.createSystem(payload);
