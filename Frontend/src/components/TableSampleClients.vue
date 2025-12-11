@@ -77,13 +77,8 @@ const openModalDelete = (userId) => {
 
 const removeTask = async (taskId) => {
   let result = await mainStore.removeTask(taskId);
-  if (result.status == "ok") {
-    alert(result.message);
-    await mainStore.fetchSampleClients();
-  } else {
-    alert(result.message);
-    await mainStore.fetchSampleClients();
-  }
+  alert(result.message);
+  await mainStore.fetchSampleClients();
 };
 </script>
 
