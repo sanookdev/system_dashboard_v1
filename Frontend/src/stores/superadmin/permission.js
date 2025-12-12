@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import axios from "axios";
 import api from "@/utils/api";
 
 const apiUrl = "/superadmin/permission";

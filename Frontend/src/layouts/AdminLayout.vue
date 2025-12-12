@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="navbar lg:hidden bg-base-100 shadow-sm">
-      <div class="flex-none">
+    <div class="navbar lg:hidden bg-accent shadow-sm fixed top-0 w-full z-50">
+      <div class="flex pl-5 w-full">
         <label class="btn btn-square btn-ghost drawer-button" for="my-drawer-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -18,13 +18,13 @@
           </svg>
         </label>
       </div>
-      <div class="flex w-full justify-end">
+      <div class="flex w-full">
         <div class="flex items-center">
           <div class="flex lg:hidden items-center gap-2">
             <div class="avatar">
               <div class="rounded-full overflow-hidden">
                 <div class="w-10 object-cover object-top">
-                  <img :src="avatarUrl" alt="" />
+                  <img :src="avatarUrl" />
                 </div>
               </div>
             </div>
@@ -44,10 +44,11 @@
         </div>
       </div>
     </div>
-    <div class="drawer lg:drawer-open">
+    <div class="drawer lg:drawer-open mt-16 lg:mt-0">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content mx-4 my-6">
         <div class="flex justify-between mb-6 px-5">
+          <div></div>
           <div class="hidden lg:flex items-center gap-2">
             <div class="avatar">
               <div
@@ -86,7 +87,7 @@
         </div>
       </div>
 
-      <div class="drawer-side">
+      <div class="drawer-side z-[60]">
         <label
           for="my-drawer-2"
           aria-label="close sidebar"
@@ -225,6 +226,11 @@ const menus = [
     name: "สิทธิ์การเข้าถึงระบบ",
     routeName: "superadmin-permission",
     icon: "UserRoundPen",
+  },
+  {
+    name: "Login Logs",
+    routeName: "superadmin-login-logs",
+    icon: "brick-wall-fire",
   },
 ];
 </script>

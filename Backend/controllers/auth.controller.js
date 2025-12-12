@@ -1,5 +1,5 @@
 
-const { User, employeeAuth, SystemPermission, System, Category, LoginLog, sequelize } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -9,8 +9,6 @@ dotenv.config();
 const recordLoginLog = async (username) => {
   try {
     const now = new Date();
-
-
     // ค้นหา username ถ้าไม่เจอให้สร้างใหม่ (created_at, lastlogin_at เป็นเวลาปัจจุบัน)
     const [log, created] = await LoginLog.findOrCreate({
       where: { username: username },
@@ -33,6 +31,27 @@ const recordLoginLog = async (username) => {
 
 module.exports = {
 
+  async loginlogs() {
+    try {
+      const logsList = await LoginLog.findAll({
+        order: [
+          ["username", "ASC"],
+        ],
+      });
+      return {
+        status: true,
+        message: "โหลดข้อมูลสำเร็จ",
+        data: logsList,
+      };
+    } catch (error) {
+      console.error("Loginlogs error:", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ - login logs errror",
+        error: error.message,
+      };
+    }
+  },
   // Get all access systems of username
   async authorizeSystem(username) {
     try {

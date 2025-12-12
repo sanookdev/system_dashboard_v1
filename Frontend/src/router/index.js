@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
 import AdminDashboardView from "@/views/admin/DashboardView.vue";
 import PermissionView from "@/views/admin/PermissionView.vue";
+import LoginLogsView from "@/views/admin/LoginLogsView.vue";
 import AdminCategory from "@/views/admin/CategoryView.vue";
 import AdminSystems from "@/views/admin/SystemsView.vue";
 import UserDashboard from "@/views/user/DashboardView.vue";
@@ -26,6 +27,12 @@ const router = createRouter({
       name: "superadmin-permission",
       component: PermissionView,
       meta: { title: "สิทธิ์การใช้งาน", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
+      path: "/superadmin/loginlogs",
+      name: "superadmin-login-logs",
+      component: LoginLogsView,
+      meta: { title: "Login Logs", requiresAuth: true, role: ["admin", "superadmin"] },
     },
     {
       path: "/superadmin/systems",

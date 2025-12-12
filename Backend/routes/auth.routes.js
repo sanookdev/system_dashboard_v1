@@ -1,15 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
-const userSystemController = require("../controllers/user/systems.controller")
 const adminSystem = ["admin", "superadmin", "system"];
 const cache = require("../utils/cache.js");
 const crypto = require("crypto")
 
 const {
   verifyToken,
-  isInRole,
-  setUser,
   verifyApplicationKey,
   refreshToken,
   passwordHashForAuthen,
@@ -432,6 +429,25 @@ router.get("/genkey", async (req, res) => {
       status: true,
       appkey: appkey,
     });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
+});
+router.get("/loginlogs", verifyApplicationKey, async (req, res) => {
+  try {
+    try {
+      const logsList = await authController.loginlogs();
+      res.status(logsList.data ? 200 : 500).json(logsList);
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: "Failed to authenticate user",
+        error: error.message,
+      });
+    }
   } catch (error) {
     res.status(500).json({
       status: false,
