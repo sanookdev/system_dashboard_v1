@@ -35,7 +35,7 @@ module.exports = {
     try {
       const logsList = await LoginLog.findAll({
         order: [
-          ["username", "ASC"],
+          ["lastlogin_at", "DESC"],
         ],
       });
       return {
