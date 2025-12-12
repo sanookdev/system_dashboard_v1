@@ -92,7 +92,8 @@
           for="my-drawer-2"
           aria-label="close sidebar"
           class="drawer-overlay"
-        ></label>
+        >
+        </label>
         <ul class="menu text-base-content min-h-full w-70 p-4 bg-white">
           <div class="lg:mb-8">
             <li>

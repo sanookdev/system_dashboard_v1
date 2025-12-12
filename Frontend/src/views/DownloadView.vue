@@ -75,5 +75,3 @@ const openLink = (url) => {
   }
 };
 </script>
-
-<style scoped></style>

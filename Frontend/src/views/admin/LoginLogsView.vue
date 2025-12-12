@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, getCurrentInstance } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import { useLogsStore } from "@/stores/superadmin/loginlogs";
 import Table from "@/components/Table.vue";
@@ -35,5 +35,3 @@ onMounted(async () => {
   logsLoaded.value = false;
 });
 </script>
-
-<style scoped></style>
