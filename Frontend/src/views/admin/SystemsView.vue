@@ -58,6 +58,17 @@
               </select>
             </div>
             <div class="flex flex-col">
+              <div class="label">PUBLIC</div>
+              <select
+                v-model="systemForm.public"
+                class="select select-bordered"
+              >
+                <option disabled value="">Choose</option>
+                <option value="true">Public</option>
+                <option value="false">Unpublic</option>
+              </select>
+            </div>
+            <div class="flex flex-col">
               <div class="label">SSO TOKEN</div>
               <select v-model="systemForm.sso" class="select select-bordered">
                 <option disabled value="">SSO-TOKEN</option>
@@ -142,7 +153,15 @@
           ระบบงานทั้งหมด
         </div>
         <Table
-          :headers="['icon', 'name', 'category', 'url', 'sso', 'sso_code']"
+          :headers="[
+            'icon',
+            'name',
+            'category',
+            'url',
+            'sso',
+            'sso_code',
+            'public',
+          ]"
           :rows="systems"
           :edit_button="true"
           :delete_button="true"
@@ -185,6 +204,7 @@ const systemForm = ref({
   category_id: "",
   sso: "",
   sso_code: "",
+  public: "",
 });
 
 const isEditMode = ref(false);
@@ -226,6 +246,7 @@ const onEdit = (row) => {
     category_id: row.category_id || "",
     sso: row.sso,
     sso_code: row.sso_code,
+    public: row.public,
   };
   console.log(systemForm.value);
 };
@@ -277,6 +298,7 @@ const onSubmit = async () => {
     category_id: systemForm.value.category_id,
     sso: systemForm.value.sso,
     sso_code: systemForm.value.sso_code,
+    public: systemForm.value.public,
   };
 
   let result;
@@ -304,6 +326,7 @@ const clearSystemForm = () => {
     category_id: "",
     sso: "",
     sso_code: "",
+    public: "",
   };
   isEditMode.value = false;
 };

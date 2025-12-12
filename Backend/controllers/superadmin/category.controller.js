@@ -1,4 +1,5 @@
-const { Category, System, CategoryPermission } = require("../../models");
+const { Category, System, CategoryPermission, Sequelize } = require("../../models");
+const { Op } = Sequelize;
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -25,6 +26,11 @@ module.exports = {
               "sso_code",
               "public"
             ],
+            where: {
+              public: {           // <--- ระบุชื่อคอลัมน์ก่อน
+                [Op.eq]: 1        // <--- ค่า public ไม่เท่ากับ 1
+              }
+            }
           },
           {
             model: CategoryPermission,

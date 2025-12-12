@@ -44,6 +44,11 @@ module.exports = {
               "sso_code",
               "public"
             ],
+            where: {
+              public: {
+                [Op.eq]: 1
+              }
+            },
             include: [
               {
                 model: SystemPermission,
