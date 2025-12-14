@@ -37,6 +37,7 @@
     "tailwindcss": "^4.1.7",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
+    "vite-plugin-vuetify": "^2.1.2",
     "vitest": "^3.2.3"
   }
 }

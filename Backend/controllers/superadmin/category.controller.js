@@ -1,4 +1,9 @@
-const { Category, System, CategoryPermission, Sequelize } = require("../../models");
+const {
+  Category,
+  System,
+  CategoryPermission,
+  Sequelize,
+} = require("../../models");
 const { Op } = Sequelize;
 const dotenv = require("dotenv");
 dotenv.config();
@@ -11,6 +16,7 @@ module.exports = {
           {
             model: System,
             as: "systems",
+            required: false,
             attributes: [
               "id",
               "icon",
@@ -24,13 +30,14 @@ module.exports = {
               "img_icon",
               "sso",
               "sso_code",
-              "public"
+              "public",
             ],
             where: {
-              public: {           // <--- ระบุชื่อคอลัมน์ก่อน
-                [Op.eq]: 1        // <--- ค่า public ไม่เท่ากับ 1
-              }
-            }
+              public: {
+                // <--- ระบุชื่อคอลัมน์ก่อน
+                [Op.eq]: 1, // <--- ค่า public ไม่เท่ากับ 1
+              },
+            },
           },
           {
             model: CategoryPermission,

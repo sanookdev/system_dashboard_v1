@@ -1,7 +1,7 @@
 # VITE_APP_ENV=development
 VITE_APP_ENV=development
-VITE_BASE_PATH=/intra_dashboard_v1
-VITE_BASE_PATH_PRODUCTION=/intra_dashboard_v1
+VITE_BASE_PATH=/intra_dashboard
+VITE_BASE_PATH_PRODUCTION=/intra_dashboard
 
 VITE_IS_PRODUCTION=false
 

@@ -25,7 +25,7 @@
     "moment-timezone": "^0.5.48",
     "mysql2": "^3.14.1",
     "node-cache": "^5.1.2",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "path-to-regexp": "^6.2.1",
     "sequelize": "^6.37.7"
   }
