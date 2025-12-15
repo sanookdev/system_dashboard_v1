@@ -2,9 +2,14 @@
   <div>
     <AdminLayout>
       <div class="flex justify-between">
-        <div class="flex items-center gap-2 text-sm">
-          <div class="label">จำนวนระบบทั้งหมด :</div>
-          <div class="text-accent">{{ systems.length }} ระบบ</div>
+        <div class="flex flex-col gap-2 text-sm">
+          <div class="flex">
+            <div class="label">จำนวนระบบทั้งหมด :</div>
+            <div class="text-accent">{{ systems.length }} ระบบ</div>
+          </div>
+          <div class="badge badge-warning">
+            SSO หมายถึงสามารถเข้าระบบได้โดยไม่ต้องลงชื่อเข้าใช้ใหม่
+          </div>
         </div>
         <div class="input input-bordered flex items-center gap-2 h-10">
           <input
