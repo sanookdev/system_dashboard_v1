@@ -18,14 +18,13 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <a
-          href="https://risk-system.url"
+          href="http://203.131.209.137/main/RiskRegister/#/"
           target="_blank"
           class="group card bg-base-100 border border-error/20 hover:border-error hover:shadow-lg transition-all duration-300 relative overflow-hidden"
         >
           <div
             class="absolute inset-0 bg-error/5 group-hover:bg-error/10 transition-colors"
           ></div>
-
           <div class="card-body flex flex-row items-center gap-4 relative z-10">
             <div
               class="p-4 rounded-xl bg-error text-white shadow-lg shadow-error/30 group-hover:scale-110 transition-transform"
@@ -47,14 +46,13 @@
         </a>
 
         <a
-          href="https://dean-direct.url"
+          href="mailto:meddeantu@gmail.com"
           target="_blank"
           class="group card bg-base-100 border border-primary/20 hover:border-primary hover:shadow-lg transition-all duration-300 relative overflow-hidden"
         >
           <div
             class="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors"
           ></div>
-
           <div class="card-body flex flex-row items-center gap-4 relative z-10">
             <div
               class="p-4 rounded-xl bg-primary text-primary-content shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform"
@@ -80,7 +78,7 @@
         หน่วยงานและบริการ
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <a
           v-for="(item, idx) in generalChannels"
           :key="idx"
@@ -93,7 +91,6 @@
               <div :class="`p-3 rounded-lg ${item.bgClass} ${item.textClass}`">
                 <component :is="item.icon" class="w-6 h-6" />
               </div>
-
               <span class="badge badge-ghost text-xs font-light"
                 >Student & General</span
               >
@@ -108,34 +105,37 @@
         </a>
       </div>
 
-      <div class="card bg-base-100 border-l-4 border-l-neutral shadow-sm mt-8">
+      <a
+        href="#"
+        target="_blank"
+        class="card bg-neutral/5 border border-neutral/10 hover:bg-white hover:border-neutral hover:shadow-lg transition-all duration-300 group mt-4"
+      >
         <div
           class="card-body p-6 flex flex-col md:flex-row items-center justify-between gap-6"
         >
           <div class="flex items-center gap-4">
-            <div class="p-3 bg-neutral text-neutral-content rounded-full">
+            <div
+              class="p-3 bg-neutral text-neutral-content rounded-full shadow-md"
+            >
               <HeartHandshake class="w-6 h-6" />
             </div>
             <div>
-              <h3 class="font-bold text-lg text-neutral">สำหรับบุคลากร</h3>
+              <h3 class="font-bold text-lg text-neutral-focus">
+                สำหรับบุคลากร (Staff Only)
+              </h3>
               <p class="text-sm text-base-content/60">
                 ช่องทางร้องเรียนภายใน สวัสดิการ และงาน HR
               </p>
             </div>
           </div>
-
-          <a
-            href="https://staff-system.url"
-            target="_blank"
-            class="btn btn-neutral btn-wide gap-2 group"
+          <div
+            class="flex items-center gap-2 text-neutral text-sm font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform"
           >
             ไปหน้าร้องเรียน
-            <ArrowRight
-              class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-            />
-          </a>
+            <ArrowRight class="w-4 h-4" />
+          </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </template>
