@@ -12,6 +12,7 @@ import DownloadpageAdmin from "@/views/admin/DownloadView.vue"
 import CalendarpageAdmin from "@/views/admin/EventCalendar.vue"
 // ✅ import store
 import { useAccountStore } from "@/stores/account";
+import ComplaintHubView from "@/views/ComplaintHubView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -86,6 +87,12 @@ const router = createRouter({
       name: "event-calendarAdmin",
       component: CalendarpageAdmin,
       meta: { title: "Event Calendar", requiresAuth: true, role: ["user", "superadmin", "admin"] }
+    },
+    {
+      path: "/complainthub",
+      name: "complaint-hub",
+      component: ComplaintHubView,
+      meta: { title: "ร้องเรียน" }
     },
     {
       path: "/login",
