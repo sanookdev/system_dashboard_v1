@@ -25,7 +25,7 @@ app.config.globalProperties.$alertify = alertify;
 
 router.beforeEach((to, from, next) => {
   const defaultTitle = "ชื่อเว็บไซต์ของคุณ";
-  document.title = "Intranet : " + to.meta.title || defaultTitle;
+  document.title = to.meta.title || defaultTitle;
   next();
 });
 
