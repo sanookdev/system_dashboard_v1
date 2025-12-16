@@ -112,11 +112,6 @@
               <div :class="`p-3 rounded-lg ${item.bgClass} ${item.textClass}`">
                 <component :is="item.icon" class="w-6 h-6" />
               </div>
-              <span
-                class="bg-gray-100 p-2 rounded-xl text-[14px] font-medium text-base-content/40"
-              >
-                นิสิตและบุคคลทั่วไป<br />Student & General
-              </span>
             </div>
 
             <h3
@@ -128,49 +123,15 @@
               {{ item.titleEn }}
             </div>
 
-            <p class="text-sm text-base-content/70">{{ item.desc }}</p>
-            <p class="text-sm text-base-content/50 mt-1">{{ item.descEn }}</p>
+            <!-- <p class="text-sm text-base-content/70">{{ item.desc }}</p>
+            <p class="text-sm text-base-content/50 mt-1">{{ item.descEn }}</p>  -->
+            <p class="text-sm text-base-content/70">รายละเอียด (ภาษาไทย)</p>
+            <p class="text-sm text-base-content/50 mt-1">
+              รายละเอียด (ภาษาอังกฤษ)
+            </p>
           </div>
         </a>
       </div>
-
-      <a
-        href="#"
-        target="_blank"
-        class="card bg-neutral/5 border border-neutral/10 hover:bg-white hover:border-neutral hover:shadow-lg transition-all duration-300 group mt-4"
-      >
-        <div
-          class="card-body p-6 flex flex-col md:flex-row items-center justify-between gap-6"
-        >
-          <div class="flex items-center gap-4">
-            <div
-              class="p-3 bg-neutral text-neutral-content rounded-full shadow-md"
-            >
-              <LockKeyhole class="w-6 h-6" />
-            </div>
-            <div>
-              <h3 class="font-bold text-lg text-neutral-focus">
-                สำหรับบุคลากร
-                <span class="text-base font-normal opacity-70 ml-1"
-                  >(Staff Only)</span
-                >
-              </h3>
-              <p class="text-sm text-base-content/60">
-                ช่องทางร้องเรียนภายใน สวัสดิการ และงาน HR
-              </p>
-              <p class="text-sm text-base-content/40 mt-0.5">
-                Internal complaints, welfare, and HR services.
-              </p>
-            </div>
-          </div>
-          <div
-            class="flex items-center gap-2 text-neutral text-sm font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform whitespace-nowrap"
-          >
-            <span>เข้าสู่ระบบ / Login</span>
-            <ArrowRight class="w-4 h-4" />
-          </div>
-        </div>
-      </a>
     </div>
   </div>
 </template>
@@ -190,8 +151,8 @@ import {
 
 const generalChannels = ref([
   {
-    title: "ร้องเรียนบริการการศึกษา",
-    titleEn: "Educational Services",
+    title: "ร้องเรียนสำหรับนักศึกษา ป.ตรี",
+    titleEn: "Complaints for Undergraduate Students",
     desc: "งานทะเบียน ตารางเรียน-สอบ และหลักสูตร",
     descEn: "Registration, class schedules, and curriculum.",
     icon: GraduationCap, // ส่ง Object Component (ห้ามใส่ "")
@@ -200,24 +161,24 @@ const generalChannels = ref([
     textClass: "text-info",
   },
   {
-    title: "ร้องเรียนงานกิจ",
-    titleEn: "Student Affairs",
+    title: "ร้องเรียนสำหรับนักศึกษา ป.โท-เอก",
+    titleEn: "Complaints for Graduate Students",
+    desc: "งานทะเบียน ตารางเรียน-สอบ และหลักสูตร",
+    descEn: "Registration, class schedules, and curriculum.",
+    icon: GraduationCap, // ส่ง Object Component (ห้ามใส่ "")
+    link: "#",
+    bgClass: "bg-info/10",
+    textClass: "text-info",
+  },
+  {
+    title: "ร้องเรียนสำหรับแพทย์ประจำบ้าน/ต่อยอด",
+    titleEn: "Complaints for Residents and Fellows",
     desc: "ทุน กิจกรรม ชมรม และสวัสดิการนิสิต",
     descEn: "Scholarships, activities, clubs, and student welfare.",
     icon: UsersRound,
     link: "#",
     bgClass: "bg-secondary/10",
     textClass: "text-secondary",
-  },
-  {
-    title: "ข้อเสนอแนะ",
-    titleEn: "General Suggestions",
-    desc: "แจ้งข้อเสนอแนะเพิ่มเติม หรือไอเดียพัฒนา",
-    descEn: "Submit general feedback or development ideas.",
-    icon: MessageSquareText,
-    link: "#",
-    bgClass: "bg-accent/10",
-    textClass: "text-accent",
   },
 ]);
 </script>
