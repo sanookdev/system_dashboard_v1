@@ -126,7 +126,7 @@
     </UserLayout>
     <div
       v-if="redirectLoading"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 text-white"
+      class="fixed inset-0 z-70 flex flex-col items-center justify-center bg-black bg-opacity-60 text-white"
     >
       <span class="loading loading-spinner loading-lg mb-4"></span>
       <p class="text-xl">{{ redirectLoadingText }}</p>
