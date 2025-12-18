@@ -30,7 +30,7 @@ app.use(
 
         // 4. สำหรับ Lucide Icons และรูปภาพ
         // data: จำเป็นสำหรับ Lucide ที่บางครั้งแปลงเป็น Data URI
-        "img-src": ["'self'", "data:", "https://*.googleusercontent.com", "https://*.gstatic.com"],
+        "img-src": ["'self'", "data:", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://eservice.med.tu.ac.th"],
 
         // 5. สำหรับการเชื่อมต่อ API (ต้องครอบคลุมโดเมนใน allowedOrigins ของคุณ)
         "connect-src": [
@@ -39,7 +39,9 @@ app.use(
           "https://student.med.tu.ac.th",
           "http://203.131.209.137",
           "http://localhost:5173",
-          "http://172.17.1.250:5173"
+          "http://172.17.1.250:5173",
+          "https://corsproxy.io",
+          "https://unpkg.com"
         ],
 
         // 6. สำหรับ Vue.js 3
