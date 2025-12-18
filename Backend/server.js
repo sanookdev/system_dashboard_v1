@@ -30,7 +30,7 @@ app.use(
 
         // 4. สำหรับ Lucide Icons และรูปภาพ
         // data: จำเป็นสำหรับ Lucide ที่บางครั้งแปลงเป็น Data URI
-        "img-src": ["'self'", "data:", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://eservice.med.tu.ac.th"],
+        "img-src": ["'self'", "data:", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://eservice.med.tu.ac.th", "https://img.daisyui.com"],
 
         // 5. สำหรับการเชื่อมต่อ API (ต้องครอบคลุมโดเมนใน allowedOrigins ของคุณ)
         "connect-src": [
