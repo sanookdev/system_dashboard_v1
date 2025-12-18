@@ -153,7 +153,7 @@ const route = useRoute();
 const router = useRouter();
 
 const defaultAvatar = ref(
-  "https://img.daisyui.com/images/profile/demo/yellingcat@192.webp"
+  "https://img.daisyui.com/images/profile/demo/spiderperson@192.webp"
 );
 const avatarUrl = ref(null);
 

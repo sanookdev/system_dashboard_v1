@@ -41,7 +41,8 @@ app.use(
           "http://localhost:5173",
           "http://172.17.1.250:5173",
           "https://corsproxy.io",
-          "https://unpkg.com"
+          "https://unpkg.com",
+          "https://localhost:5057"
         ],
 
         // 6. สำหรับ Vue.js 3
