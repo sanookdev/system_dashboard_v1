@@ -29,11 +29,9 @@
         </div>
         <div class="text-center">
           <h1 class="text-2xl font-bold text-gray-800 tracking-wide">
-            MED LOGIN
+            Single Portal Login
           </h1>
-          <p class="text-xl text-gray-500 font-light">
-            ระบบสำหรับบุคลากรคณะแพทย์ฯ
-          </p>
+          <p class="text-xl text-gray-500 font-light">สำหรับบุคลากรคณะแพทย์ฯ</p>
         </div>
       </div>
 
@@ -278,8 +276,8 @@
               ></path>
             </svg>
             <span
-              >โปรดอ่านข้อกำหนดนี้อย่างละเอียดก่อนเข้าใช้งานระบบ Intranet
-              Dashboard</span
+              >โปรดอ่านข้อกำหนดนี้อย่างละเอียดก่อนเข้าใช้งานระบบ Single
+              Portal</span
             >
           </div>
 

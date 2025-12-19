@@ -103,7 +103,7 @@
                   <img :src="logoUrl" alt="" />
                 </div>
                 <div>
-                  <h1 class="text-xl font-semibold">INTRANET</h1>
+                  <h1 class="text-xl font-semibold">Single Portal</h1>
                 </div>
               </div>
             </li>
