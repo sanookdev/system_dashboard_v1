@@ -8,7 +8,7 @@
               <div class="label">จำนวนระบบทั้งหมด :</div>
               <div class="text-accent">{{ systems.length }} ระบบ</div>
             </div>
-            <div class="badge badge-warning">
+            <div class="badge badge-warning h-full w-full p-2">
               SSO หมายถึงสามารถเข้าระบบได้โดยไม่ต้องลงชื่อเข้าใช้ใหม่
             </div>
           </div>
