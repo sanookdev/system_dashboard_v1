@@ -89,8 +89,8 @@ const router = createRouter({
       meta: { title: "Event Calendar", requiresAuth: true, role: ["user", "superadmin", "admin"] }
     },
     {
-      path: "/complainthub",
-      name: "complaint-hub",
+      path: "/complainprivate",
+      name: "complain",
       component: ComplaintHubView,
       meta: { title: "ร้องเรียน" }
     },
