@@ -67,6 +67,12 @@ const downloadList = [
     icon: "",
     link: "https://med.tu.ac.th/researchoffices/?page_id=841701",
   },
+    {
+    title: "ระบบเอกสารภาษีของคณะ",
+    description: "จากมหาลัย",
+    icon: "",
+    link: "https://tax50.ict.tu.ac.th/tu_tax/",
+  },
 ];
 
 const openLink = (url) => {
