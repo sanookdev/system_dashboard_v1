@@ -226,7 +226,7 @@ onMounted(async () => {
       .set({ title: "Session หมดอายุ" });
   }
   const res = await fetch(
-    "https://corsproxy.io/?https://unpkg.com/@iconify-json/lucide@latest/icons.json"
+    "https://unpkg.com/@iconify-json/lucide@latest/icons.json"
   );
   const data = await res.json();
   iconsList01.value = Object.keys(data.icons);
