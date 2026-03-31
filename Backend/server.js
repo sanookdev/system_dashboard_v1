@@ -8,7 +8,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  'http://172.17.1.250:5173',
+  'http://172.17.1.107:5173',
   "https://med.tu.ac.th",
   "http://203.131.209.137",
   "https://student.med.tu.ac.th",

@@ -124,13 +124,6 @@
         </transition>
       </div>
     </UserLayout>
-    <div
-      v-if="redirectLoading"
-      class="fixed inset-0 z-70 flex flex-col items-center justify-center bg-black bg-opacity-60 text-white"
-    >
-      <span class="loading loading-spinner loading-lg mb-4"></span>
-      <p class="text-xl">{{ redirectLoadingText }}</p>
-    </div>
   </div>
 </template>
 
@@ -152,8 +145,6 @@ const searchQuery = ref("");
 
 const selectedTabId = ref(null);
 
-const redirectLoadingText = ref("...");
-
 const categories = computed(() => categoriesStore.list);
 
 const systems = computed(() => {
@@ -168,7 +159,6 @@ const systems = computed(() => {
 
   return list;
 });
-const redirectLoading = ref(false);
 
 onMounted(async () => {
   await categoriesStore.getCategories();
@@ -188,10 +178,9 @@ const toggleListView = () => {
 };
 
 const openSubsystemCode = async (system) => {
+  let targetWindow = null;
   try {
-    redirectLoading.value = true;
-    redirectLoadingText.value = "กำลังยืนยันตัวตน...";
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    targetWindow = window.open('', '_blank');
     const { id: system_id, url: system_url } = system;
     const ssoResponse = await accountStore.ssoStart_other(system_id);
     console.log(ssoResponse);
@@ -206,19 +195,21 @@ const openSubsystemCode = async (system) => {
         ? `${system_url}${ssoResponse.query}`
         : system_url;
       console.log(redirect_to_subsystem);
-      window.open(redirect_to_subsystem, "_blank");
+      if (targetWindow) {
+        targetWindow.location.href = redirect_to_subsystem;
+      } else {
+        window.open(redirect_to_subsystem, "_blank");
+      }
     }
   } catch (error) {
+    if (targetWindow) targetWindow.close();
     console.error(error);
-  } finally {
-    redirectLoading.value = false;
   }
 };
 const openSubsystem = async (system) => {
+  let targetWindow = null;
   try {
-    redirectLoading.value = true;
-    redirectLoadingText.value = "กำลังยืนยันตัวตน...";
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    targetWindow = window.open('', '_blank');
 
     const token = encodeURIComponent(accountStore.token);
     const { id: system_id, url: system_url } = system;
@@ -230,13 +221,11 @@ const openSubsystem = async (system) => {
       throw new Error(ssoResponse?.message || "เริ่ม SSO ไม่สำเร็จ");
     } else {
       console.log("sso pass");
-      redirectLoadingText.value = "กำลังเช็คสิทธิ์การใช้งาน...";
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const authorizeResponse = ssoResponse.status
       ? await accountStore.authorize_system(ssoResponse.redirect, system_id)
-      : (authorizeResponse.status = false);
+      : { status: false };
 
     if (!authorizeResponse?.status) {
       console.log(authorizeResponse);
@@ -245,19 +234,21 @@ const openSubsystem = async (system) => {
       );
     } else {
       console.log("authorize system pass");
-      redirectLoadingText.value = "กำลังนำท่านเข้าสู่ระบบ...";
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (authorizeResponse.status) {
-      window.open(redirect_to_subsystem, "_blank");
+      if (targetWindow) {
+        targetWindow.location.href = redirect_to_subsystem;
+      } else {
+        window.open(redirect_to_subsystem, "_blank");
+      }
     } else {
+      if (targetWindow) targetWindow.close();
       alert(authorizeResponse.message);
     }
   } catch (error) {
+    if (targetWindow) targetWindow.close();
     console.error(error);
-  } finally {
-    redirectLoading.value = false;
   }
 };
 </script>
