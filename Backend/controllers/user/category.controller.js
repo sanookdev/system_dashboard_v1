@@ -110,17 +110,24 @@ module.exports = {
       };
     }
   },
-  async findAllByEmployee(employee_code) {
+  async findAllByEmployee(employee_code, user_type) {
     try {
+      const whereClause = {
+        [Op.or]: [
+          { public: 1 },
+          { "$permissions.employee_code$": employee_code },
+        ],
+      };
+      
+      // ถ้าเป็นผู้ใช้ภายนอก จะไม่ให้เห็น "ระบบงานพื้นฐาน" เด็ดขาด แม้จะ public = 1 ก็ตาม
+      if (user_type === "external") {
+        whereClause.name = { [Op.ne]: "ระบบงานพื้นฐาน" };
+      }
+
       // 1. Query DB (ส่วนนี้ถูกต้องแล้วครับ ใช้ include แบบ required: false)
       const categories = await Category.findAll({
         attributes: ["id", "name", "public"],
-        where: {
-          [Op.or]: [
-            { public: 1 },
-            { "$permissions.employee_code$": employee_code },
-          ],
-        },
+        where: whereClause,
         include: [
           {
             model: CategoryPermission,

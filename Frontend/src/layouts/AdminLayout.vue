@@ -232,6 +232,11 @@ const menus = [
     routeName: "superadmin-login-logs",
     icon: "brick-wall-fire",
   },
+  {
+    name: "ผู้ใช้ภายนอก",
+    routeName: "superadmin-external-users",
+    icon: "Users",
+  },
 ];
 </script>
 <style scoped></style>

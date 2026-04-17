@@ -54,6 +54,7 @@ db.System.hasMany(db.SystemPermission, {
 });
 
 db.User = require("./user.model")(sequelize, DataTypes);
+db.ExternalUser = require("./external_user.model")(sequelize, DataTypes);
 db.Category = require("./superadmin/category.model")(sequelize, DataTypes);
 
 db.Category.hasMany(db.System, {

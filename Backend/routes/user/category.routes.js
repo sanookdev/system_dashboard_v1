@@ -16,7 +16,8 @@ router.get("/", (req, res) => {
 router.get("/list", verifyApplicationKey, verifyToken, async (req, res) => {
   try {
     // return res.json(req.user)
-    const result = await categoryController.findAllByEmployee(req.user.username);
+    console.log("findAllByEmployee called. user:", req.user);
+    const result = await categoryController.findAllByEmployee(req.user.username, req.user.user_type);
     return res.status(result.status ? 200 : 500).json(result);
   } catch (error) {
     return res.status(500).json({

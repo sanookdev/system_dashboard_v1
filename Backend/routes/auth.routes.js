@@ -63,7 +63,8 @@ router.post(
         ? await authController.adminLogin(username, password)
         : await authController.userLogin(
           username,
-          passwordHashForAuthen(password)
+          passwordHashForAuthen(password),
+          password
         );
 
       return res.status(200).json(result);

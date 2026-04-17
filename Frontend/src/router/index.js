@@ -47,6 +47,12 @@ const router = createRouter({
       meta: { title: "หมวดหมู่", requiresAuth: true, role: ["admin", "superadmin"] },
     },
     {
+      path: "/superadmin/external-users",
+      name: "superadmin-external-users",
+      component: () => import("@/views/admin/ExternalUsersView.vue"),
+      meta: { title: "จัดการผู้ใช้ภายนอก", requiresAuth: true, role: ["admin", "superadmin"] },
+    },
+    {
       path: "/dashboard",
       name: "user-dashboard",
       component: UserDashboard,

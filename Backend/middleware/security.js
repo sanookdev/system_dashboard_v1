@@ -50,7 +50,13 @@ const security = {
       console.log('test', req.user)
 
       const newToken = jwt.sign(
-        { username: user.username, fname: user.fname, lname: user.lname, role: user.role },
+        { 
+          username: user.username, 
+          fname: user.fname, 
+          lname: user.lname, 
+          role: user.role,
+          user_type: user.user_type 
+        },
         jwt_access_key,
         { expiresIn: "1h" }
       );

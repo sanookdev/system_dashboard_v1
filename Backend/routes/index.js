@@ -4,6 +4,7 @@ const router = express.Router();
 router.use("/superadmin/category", require("./superadmin/category.routes"));
 router.use("/superadmin/permission", require("./superadmin/permission.routes"));
 router.use("/superadmin/systems", require("./superadmin/systems.routes"));
+router.use("/superadmin/external_users", require("./superadmin/external_user.routes"));
 router.use("/user/category", require("./user/category.routes"));
 router.use("/auth", require("./auth.routes"));
 router.get("/", (req, res) => {

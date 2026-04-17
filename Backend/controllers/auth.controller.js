@@ -143,11 +143,26 @@ module.exports = {
           message: "กรุณาระบุ username และ password",
         };
       }
-      const user = await employeeAuth.findOne({ where: { username } });
-      if (!user) return { status: false, message: "ไม่พบผู้ใช้งาน" };
+      let user = await employeeAuth.findOne({ where: { username } });
+      let isExternal = false;
+      let passwordMatched = false;
 
-      // ✅ ตรวจสอบรหัสผ่าน
-      if (password.password !== user.password) {
+      if (!user) {
+        const { ExternalUser } = require("../models");
+        user = await ExternalUser.findOne({ where: { username, is_active: true } });
+        if (!user) return { status: false, message: "ไม่พบผู้ใช้งาน" };
+        isExternal = true;
+
+        // สำหรับ ExternalUser เราอาจใช้ bcrypt หรือ md5 
+        // ถ้าใช้ bcrypt ต้องเอา raw password มาเทียบ
+        const bcrypt = require("bcrypt");
+        passwordMatched = arguments[2] ? await bcrypt.compare(arguments[2], user.password) : false;
+      } else {
+        // ✅ ตรวจสอบรหัสผ่านของพนักงาน (md5)
+        passwordMatched = password.password === user.password;
+      }
+
+      if (!passwordMatched) {
         return {
           status: false,
           message: "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง",
@@ -173,6 +188,7 @@ module.exports = {
           fname: user.fname,
           lname: user.lname,
           role: "user",
+          user_type: isExternal ? "external" : "employee",
         },
         process.env.ACCESS_TOKEN_KEY,
         { expiresIn: "1h" }
