@@ -87,6 +87,15 @@
                 <option value="false">NO</option>
               </select>
             </div>
+            <div class="flex flex-col">
+              <div class="label">การเข้าถึงด้วย Prefix (เว้นว่างได้) <span class="text-xs text-gray-500 ml-1">เช่น A,B,C</span></div>
+              <input
+                v-model="systemForm.access_prefixes"
+                type="text"
+                placeholder="Ex. A, B, C"
+                class="input input-bordered"
+              />
+            </div>
           </div>
           <div class="flex flex-col">
             <div class="label">รายละเอียด</div>
@@ -161,6 +170,7 @@
             'sso',
             'sso_code',
             'public',
+            'access_prefixes',
           ]"
           :rows="systems"
           :edit_button="true"
@@ -205,6 +215,7 @@ const systemForm = ref({
   sso: "",
   sso_code: "",
   public: "",
+  access_prefixes: "",
 });
 
 const isEditMode = ref(false);
@@ -247,6 +258,7 @@ const onEdit = (row) => {
     sso: row.sso,
     sso_code: row.sso_code,
     public: row.public,
+    access_prefixes: row.access_prefixes || "",
   };
   console.log(systemForm.value);
 };
@@ -299,6 +311,7 @@ const onSubmit = async () => {
     sso: systemForm.value.sso,
     sso_code: systemForm.value.sso_code,
     public: systemForm.value.public,
+    access_prefixes: systemForm.value.access_prefixes,
   };
 
   let result;
@@ -327,6 +340,7 @@ const clearSystemForm = () => {
     sso: "",
     sso_code: "",
     public: "",
+    access_prefixes: "",
   };
   isEditMode.value = false;
 };

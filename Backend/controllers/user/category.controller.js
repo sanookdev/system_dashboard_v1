@@ -42,7 +42,8 @@ module.exports = {
               "img_icon",
               "sso",
               "sso_code",
-              "public"
+              "public",
+              "access_prefixes"
             ],
             where: {
               public: {
@@ -80,6 +81,14 @@ module.exports = {
 
           // เงื่อนไขที่ 2: ถ้า System ไม่ใช่ Public (0) -> ต้องมี permission
           // เราเช็คจาก systemPermissions ที่ join มา ถ้ามีข้อมูล (length > 0) แปลว่า user นี้มีสิทธิ์
+
+          // เงื่อนไขที่ 3: เช็ค access_prefixes
+          if (sys.access_prefixes) {
+            const prefixes = sys.access_prefixes.split(",").map(p => p.trim());
+            if (typeof employee_code !== "undefined" && prefixes.some(prefix => employee_code.startsWith(prefix))) {
+              return true;
+            }
+          }
 
           return sys.systemPermissions && sys.systemPermissions.length > 0;
         });
@@ -126,7 +135,7 @@ module.exports = {
             attributes: [
               "id", "icon", "name", "description", "url",
               "owner_department", "created_at", "created_by",
-              "updated_at", "img_icon", "sso", "sso_code", "public"
+              "updated_at", "img_icon", "sso", "sso_code", "public", "access_prefixes"
             ],
             include: [
               {
@@ -160,7 +169,15 @@ module.exports = {
             return true;
           }
 
-          // ✅ 2. ถ้า Public = 0 ค่อยมาเช็ค Permission
+          // ✅ 2. เช็ค Prefix ของ Username
+          if (sys.access_prefixes) {
+            const prefixes = sys.access_prefixes.split(",").map(p => p.trim());
+            if (employee_code && prefixes.some(prefix => employee_code.startsWith(prefix))) {
+              return true;
+            }
+          }
+
+          // ✅ 3. ถ้า Public = 0 และไม่ตรง Prefix ค่อยมาเช็ค Permission
           // ถ้ามีข้อมูลใน systemPermissions (ที่ join มา) แปลว่ามีสิทธิ์
           return sys.systemPermissions && sys.systemPermissions.length > 0;
         });

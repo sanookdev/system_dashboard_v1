@@ -112,6 +112,14 @@ module.exports = {
         const plain = verify?.get({ plain: true });
         if (plain)
           return { status: true, message: "Success", ...plain };
+
+        // ✅ ตรวจสอบ access_prefixes
+        if (plainSystem.access_prefixes) {
+          const prefixes = plainSystem.access_prefixes.split(",").map(p => p.trim());
+          if (prefixes.some(prefix => username.startsWith(prefix))) {
+            return { status: true, message: "Success", isAdmin: 0 };
+          }
+        }
       }
 
       if (plainSystem.category.public) {
