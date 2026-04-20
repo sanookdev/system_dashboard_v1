@@ -14,7 +14,7 @@
     "@mdi/js": "^7.4.47",
     "@tailwindcss/vite": "^4.0.16",
     "alertifyjs": "^1.14.0",
-    "axios": "^1.8.4",
+    "axios": "^1.15.1",
     "concurrently": "^9.1.2",
     "lucide-vue-next": "^0.511.0",
     "moment": "^2.30.1",
