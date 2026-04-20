@@ -135,7 +135,7 @@ module.exports = {
       };
     }
   },
-  async userLogin(username, password) {
+  async userLogin(username, password, rawPassword) {
     try {
       if (!username || !password) {
         return {
@@ -156,7 +156,7 @@ module.exports = {
         // สำหรับ ExternalUser เราอาจใช้ bcrypt หรือ md5 
         // ถ้าใช้ bcrypt ต้องเอา raw password มาเทียบ
         const bcrypt = require("bcrypt");
-        passwordMatched = arguments[2] ? await bcrypt.compare(arguments[2], user.password) : false;
+        passwordMatched = rawPassword ? await bcrypt.compare(rawPassword, user.password) : false;
       } else {
         // ✅ ตรวจสอบรหัสผ่านของพนักงาน (md5)
         passwordMatched = password.password === user.password;

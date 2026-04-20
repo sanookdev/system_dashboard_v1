@@ -100,6 +100,22 @@ export const useExternalUsersStore = defineStore("externalUsers", {
         console.error("resetPassword error:", error);
         return { status: false, message: msg };
       }
+    },
+    
+    async importExternalUsers(users) {
+      try {
+        const res = await api.post('/superadmin/external_users/import', { users });
+        await this.getExternalUsers();
+        return {
+          status: true,
+          message: res.data.message || "นำเข้าข้อมูลสำเร็จ",
+          data: res.data,
+        };
+      } catch (error) {
+        const msg = error?.response?.data?.message || "นำเข้าข้อมูลล้มเหลว";
+        console.error("importExternalUsers error:", error);
+        return { status: false, message: msg };
+      }
     }
   },
 });

@@ -5,6 +5,7 @@ const { verifyToken, verifyApplicationKey } = require("../../middleware/security
 
 router.get("/", verifyApplicationKey, verifyToken, externalUserController.findAll);
 router.post("/", verifyApplicationKey, verifyToken, externalUserController.create);
+router.post("/import", verifyApplicationKey, verifyToken, externalUserController.importUsers);
 router.put("/:username", verifyApplicationKey, verifyToken, externalUserController.update);
 router.delete("/:username", verifyApplicationKey, verifyToken, externalUserController.remove);
 router.post("/:username/reset-password", verifyApplicationKey, verifyToken, externalUserController.resetPassword);

@@ -63,6 +63,43 @@
             </div>
           </form>
         </div>
+        
+        <div class="flex flex-col gap-2 mt-4 p-4 border rounded bg-base-100">
+          <h3 class="font-bold">นำเข้าข้อมูลผ่าน Excel</h3>
+          <div class="flex gap-4 items-center flex-wrap">
+            <button @click="downloadTemplate" class="btn btn-info btn-sm">
+              ดาวน์โหลด Template (Excel)
+            </button>
+            <div class="flex items-center gap-2">
+              <input 
+                type="file" 
+                ref="fileInput" 
+                @change="onFileChange" 
+                accept=".xlsx, .xls" 
+                class="file-input file-input-bordered file-input-sm w-full max-w-xs" 
+              />
+              <button @click="importExcel" class="btn btn-primary btn-sm" :disabled="!selectedFile">
+                นำเข้าข้อมูล
+              </button>
+            </div>
+          </div>
+          
+          <div v-if="importResult" class="mt-4 p-4 border rounded bg-base-200" :class="importResult.failedList.length ? 'border-error' : 'border-success'">
+            <h4 class="font-bold mb-2">สรุปผลการนำเข้า</h4>
+            <div class="text-sm mb-2">
+              <span class="text-success font-semibold">สำเร็จ: {{ importResult.successList.length }} รายการ</span> <span class="mx-2">|</span>
+              <span class="text-error font-semibold">ล้มเหลว: {{ importResult.failedList.length }} รายการ</span>
+            </div>
+            <div v-if="importResult.failedList.length > 0" class="mt-2 bg-base-100 p-2 rounded">
+              <p class="font-semibold text-error text-sm mb-1">รายละเอียดรายการที่ไม่สำเร็จ:</p>
+              <ul class="list-disc pl-5 text-sm text-error">
+                <li v-for="(item, idx) in importResult.failedList" :key="idx">
+                  <strong>{{ item.username }}</strong> - {{ item.reason }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- Reset Password Form -->
@@ -108,6 +145,7 @@ import { useRouter } from "vue-router";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import { useExternalUsersStore } from "@/stores/superadmin/external_users";
 import Table from "@/components/Table.vue";
+import * as XLSX from "xlsx";
 
 const { proxy } = getCurrentInstance();
 const router = useRouter();
@@ -119,6 +157,10 @@ const users = computed(() => usersStore.list);
 const form = ref({ username: "", password: "", fname: "", lname: "", is_active: true });
 const resetPasswordVal = ref("");
 const isEditMode = ref(false);
+
+const selectedFile = ref(null);
+const fileInput = ref(null);
+const importResult = ref(null);
 
 onMounted(async () => {
   loading.value = true;
@@ -214,6 +256,61 @@ const clearForm = () => {
   form.value = { username: "", password: "", fname: "", lname: "", is_active: true };
   resetPasswordVal.value = "";
   isEditMode.value = false;
+};
+
+const downloadTemplate = () => {
+  const ws = XLSX.utils.json_to_sheet([
+    { username: "EXT-001", password: "password123", fname: "ชื่อ", lname: "นามสกุล" }
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, "ExternalUser_Template.xlsx");
+};
+
+const onFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    selectedFile.value = file;
+  } else {
+    selectedFile.value = null;
+  }
+};
+
+const importExcel = () => {
+  if (!selectedFile.value) return;
+  importResult.value = null; // clear previous results
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+      
+      if (json.length === 0) {
+        proxy.$alertify.alert("ไม่พบข้อมูลในไฟล์ Excel");
+        return;
+      }
+      
+      const result = await usersStore.importExternalUsers(json);
+      proxy.$alertify
+        .alert(result.message)
+        .set({ title: result.status ? "นำเข้าเสร็จสิ้น" : "ข้อผิดพลาด" });
+        
+      if (result.status && result.data && result.data.data) {
+        importResult.value = result.data.data;
+        selectedFile.value = null;
+        if (fileInput.value) {
+          fileInput.value.value = "";
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      proxy.$alertify.alert("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel");
+    }
+  };
+  reader.readAsArrayBuffer(selectedFile.value);
 };
 </script>
 
