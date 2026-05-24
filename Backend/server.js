@@ -20,6 +20,9 @@ app.use(
       directives: {
         // 1. กฎพื้นฐาน: เชื่อถือเฉพาะโดเมนตัวเอง
         "default-src": ["'self'"],
+        "base-uri": ["'self'"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'self'"],
 
         // 2. สำหรับ Google Fonts
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
@@ -30,7 +33,14 @@ app.use(
 
         // 4. สำหรับ Lucide Icons และรูปภาพ
         // data: จำเป็นสำหรับ Lucide ที่บางครั้งแปลงเป็น Data URI
-        "img-src": ["'self'", "data:", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://eservice.med.tu.ac.th", "https://img.daisyui.com"],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://lh3.googleusercontent.com",
+          "https://fonts.gstatic.com",
+          "https://eservice.med.tu.ac.th",
+          "https://img.daisyui.com"
+        ],
 
         // 5. สำหรับการเชื่อมต่อ API (ต้องครอบคลุมโดเมนใน allowedOrigins ของคุณ)
         "connect-src": [
@@ -45,9 +55,8 @@ app.use(
           "https://localhost:5057"
         ],
 
-        // 6. สำหรับ Vue.js 3
-        // 'unsafe-eval' อาจจำเป็นในบางกรณีถ้าคุณใช้ Vue template compiler ใน browser (แต่ถ้า build แล้วมักไม่ต้องใช้)
-        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        // 6. สำหรับ Vue.js 3 (ลบ 'unsafe-inline' และ 'unsafe-eval' เพื่อความปลอดภัยสูงสุด)
+        "script-src": ["'self'"],
 
         "object-src": ["'none'"],
         "upgrade-insecure-requests": [],
@@ -60,8 +69,11 @@ app.use(
 
 app.use(cors({
   origin(origin, cb) {
-    if (!origin || allowedOrigins.includes(origin)) cb(null, true);
-    else cb(new Error("Not allowed by CORS"));
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(null, false); // ไม่อนุญาตแต่ไม่สร้าง Error เพื่อหลีกเลี่ยงการตอบกลับ 500 ที่อาจไม่มี Header ป้องกันความปลอดภัย
+    }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "application-key"],
