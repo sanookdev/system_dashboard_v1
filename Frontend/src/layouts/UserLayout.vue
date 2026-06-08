@@ -21,18 +21,21 @@
       <div class="flex w-full">
         <div class="flex items-center">
           <div class="flex lg:hidden items-center gap-2">
-            <div class="avatar">
+            <div class="avatar cursor-pointer" @click="profileModalRef?.openModal()">
               <div class="rounded-full overflow-hidden">
                 <div class="w-10 object-cover object-top">
                   <img :src="avatarUrl" />
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-1">
+            <div class="grid grid-cols-1 cursor-pointer" @click="profileModalRef?.openModal()">
               <div class="text-sm">
                 {{ accountStore.user.fname + " " + accountStore.user.lname }}
               </div>
               <div class="label text-xs">{{ accountStore.user.username }}</div>
+            </div>
+            <div class="cursor-pointer hover:opacity-80 transition-opacity" @click="profileModalRef?.openModal()" title="โปรไฟล์ของฉัน">
+              <div class="text-xs font-medium text-white/80 underline underline-offset-2">โปรไฟล์ของฉัน</div>
             </div>
             <div class="divider divider-horizontal mx-0"></div>
             <div>
@@ -50,7 +53,7 @@
         <div class="flex justify-between mb-6 px-5">
           <div></div>
           <div class="hidden lg:flex items-center gap-2">
-            <div class="avatar">
+            <div class="avatar cursor-pointer" @click="profileModalRef?.openModal()">
               <div
                 class="rounded-full overflow-hidden ring-accent ring-offset-base-100 ring-2 ring-offset-2"
               >
@@ -59,7 +62,7 @@
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-1">
+            <div class="grid grid-cols-1 cursor-pointer" @click="profileModalRef?.openModal()">
               <div class="text-sm">
                 {{ accountStore.user.fname + " " + accountStore.user.lname }}
               </div>
@@ -67,6 +70,9 @@
                 {{ accountStore.user.username }} :
                 <span class="text-info">{{ accountStore.user.role }}</span>
               </div>
+            </div>
+            <div class="cursor-pointer hover:text-accent transition-colors" @click="profileModalRef?.openModal()" title="โปรไฟล์ของฉัน">
+              <div class="text-xs font-medium text-gray-500 underline underline-offset-2 hover:text-accent">โปรไฟล์ของฉัน</div>
             </div>
             <div class="divider divider-horizontal mx-0"></div>
             <div>
@@ -139,6 +145,8 @@
     </div>
   </div>
 
+  <ProfileModal ref="profileModalRef" :user="accountStore.user" :avatar-url="avatarUrl" />
+
   <!-- Main content -->
 </template>
 <script setup>
@@ -147,9 +155,12 @@ import { RouterLink, useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { fetchAvatarUrl } from "@/utils/profileImgByUsername";
 import Footer from "@/layouts/Footer.vue";
+import ProfileModal from "@/components/ProfileModal.vue";
 
 import { useAccountStore } from "@/stores/account";
 const accountStore = useAccountStore();
+
+const profileModalRef = ref(null);
 
 const route = useRoute();
 const router = useRouter();

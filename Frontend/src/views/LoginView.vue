@@ -558,14 +558,26 @@
               </p>
             </div>
 
-            <button
-              @click="submitResetPassword"
-              :disabled="forgotLoading"
-              class="btn border-none w-full mt-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300"
-            >
-              <span v-if="!forgotLoading">เปลี่ยนรหัสผ่าน</span>
-              <span v-else class="loading loading-dots loading-md"></span>
-            </button>
+            <div class="flex gap-2 mt-2">
+              <button
+                @click="goBackToStep1"
+                :disabled="forgotLoading"
+                class="btn border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 font-semibold rounded-xl transition-all duration-200 flex-shrink-0"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                ย้อนกลับ
+              </button>
+              <button
+                @click="submitResetPassword"
+                :disabled="forgotLoading"
+                class="btn border-none flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300"
+              >
+                <span v-if="!forgotLoading">เปลี่ยนรหัสผ่าน</span>
+                <span v-else class="loading loading-dots loading-md"></span>
+              </button>
+            </div>
           </div>
 
           <!-- Step 3: Success -->
@@ -742,6 +754,15 @@ const closeForgotPasswordModal = () => {
   if (forgotPasswordModal.value) {
     forgotPasswordModal.value.close();
   }
+};
+
+const goBackToStep1 = () => {
+  forgotStep.value = 1;
+  forgotError.value = "";
+  forgotData.newPassword = "";
+  forgotData.confirmPassword = "";
+  showNewPassword.value = false;
+  showConfirmPassword.value = false;
 };
 
 const verifyIdentity = async () => {

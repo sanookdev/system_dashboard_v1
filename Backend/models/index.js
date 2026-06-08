@@ -95,6 +95,7 @@ db.LoginLog = require("./login_log")(sequelize, DataTypes);
 
 // AUTH DB
 db.employeeAuth = require("./employee_auth.model")(userDB, DataTypes);
+db.ChangePasswordLog = require("./change_password_log.model")(userDB, DataTypes);
 // (END) AUTH DB
 
 // INTRA DB

@@ -1,5 +1,5 @@
 
-const { User, employeeAuth, SystemPermission, System, Category, LoginLog, IntraPersonnel } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog, IntraPersonnel, ChangePasswordLog } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -359,12 +359,84 @@ module.exports = {
 
       await user.update({ password: hashedPassword });
 
+      // 4) บันทึก log การเปลี่ยน password ใน AUTH_DB
+      try {
+        await ChangePasswordLog.create({
+          username: username,
+          newPassword: hashedPassword,
+          changeDate: new Date(),
+          changeBy: username,
+        });
+      } catch (logError) {
+        console.error("ChangePasswordLog error (non-blocking):", logError.message);
+      }
+
       return {
         status: true,
         message: "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่",
       };
     } catch (error) {
       console.error("Reset password error:", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      };
+    }
+  },
+
+  // Change password: verify old password then update to new password
+  async changePassword(username, oldPassword, newPassword) {
+    try {
+      if (!username || !oldPassword || !newPassword) {
+        return {
+          status: false,
+          message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        };
+      }
+
+      // 1) ค้นหา user ใน AUTH_DB
+      const user = await employeeAuth.findOne({ where: { username } });
+      if (!user) {
+        return {
+          status: false,
+          message: "ไม่พบบัญชีผู้ใช้งาน",
+        };
+      }
+
+      // 2) ตรวจสอบ old password (MD5(MD5()))
+      const hashedOldPassword = md5(md5(oldPassword));
+      if (hashedOldPassword !== user.password) {
+        return {
+          status: false,
+          message: "รหัสผ่านเดิมไม่ถูกต้อง",
+        };
+      }
+
+      // 3) Hash new password ด้วย MD5(MD5())
+      const hashedNewPassword = md5(md5(newPassword));
+
+      // 4) Update password
+      await user.update({ password: hashedNewPassword });
+
+      // 5) บันทึก log
+      try {
+        await ChangePasswordLog.create({
+          username: username,
+          newPassword: hashedNewPassword,
+          changeDate: new Date(),
+          changeBy: username,
+        });
+      } catch (logError) {
+        console.error("ChangePasswordLog error (non-blocking):", logError.message);
+      }
+
+      return {
+        status: true,
+        message: "เปลี่ยนรหัสผ่านสำเร็จ",
+      };
+    } catch (error) {
+      console.error("Change password error:", error);
       return {
         status: false,
         message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",

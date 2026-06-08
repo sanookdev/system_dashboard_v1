@@ -527,4 +527,41 @@ router.post(
   }
 );
 
+router.post(
+  "/change-password",
+  verifyApplicationKey,
+  verifyToken,
+  [
+    check("oldPassword").notEmpty().withMessage("Old password is required!"),
+    check("newPassword")
+      .notEmpty()
+      .withMessage("New password is required!")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters!"),
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return res.status(400).json({ status: false, error: checkErr.errors });
+    }
+    try {
+      const username = req.user.username;
+      const { oldPassword, newPassword } = req.body;
+      const result = await authController.changePassword(
+        username,
+        oldPassword,
+        newPassword
+      );
+      return res.status(result.status ? 200 : 400).json(result);
+    } catch (error) {
+      console.error("Change password route error:", error);
+      return res.status(500).json({
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      });
+    }
+  }
+);
+
 module.exports = router;
