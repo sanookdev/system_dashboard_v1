@@ -32,6 +32,13 @@ const userDB = new Sequelize(
   { host: process.env.AUTH_DB_HOST, ...commonOptions }
 );
 
+const intraDB = new Sequelize(
+  process.env.INTRA_DB_NAME,
+  process.env.INTRA_DB_USER,
+  process.env.INTRA_DB_PASS,
+  { host: process.env.INTRA_DB_HOST, port: process.env.INTRA_DB_PORT || 3306, ...commonOptions }
+);
+
 const db = {};
 db.Sequelize = Sequelize;
 
@@ -89,5 +96,10 @@ db.LoginLog = require("./login_log")(sequelize, DataTypes);
 // AUTH DB
 db.employeeAuth = require("./employee_auth.model")(userDB, DataTypes);
 // (END) AUTH DB
+
+// INTRA DB
+db.intraDB = intraDB;
+db.IntraPersonnel = require("./intra_personnel.model")(intraDB, DataTypes);
+// (END) INTRA DB
 
 module.exports = db;

@@ -457,4 +457,74 @@ router.get("/loginlogs", verifyApplicationKey, async (req, res) => {
   }
 });
 
+router.post(
+  "/verify-identity",
+  verifyApplicationKey,
+  [
+    check("username").notEmpty().withMessage("Username is required!"),
+    check("idcard").notEmpty().withMessage("ID Card is required!"),
+    check("birthdate").notEmpty().withMessage("Date of birth is required!"),
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return res.status(400).json({ status: false, error: checkErr.errors });
+    }
+    try {
+      const { username, idcard, birthdate } = req.body;
+      const result = await authController.verifyIdentity(
+        username,
+        idcard,
+        birthdate
+      );
+      return res.status(result.status ? 200 : 400).json(result);
+    } catch (error) {
+      console.error("Verify identity route error:", error);
+      return res.status(500).json({
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      });
+    }
+  }
+);
+
+router.post(
+  "/reset-password",
+  verifyApplicationKey,
+  [
+    check("username").notEmpty().withMessage("Username is required!"),
+    check("idcard").notEmpty().withMessage("ID Card is required!"),
+    check("birthdate").notEmpty().withMessage("Date of birth is required!"),
+    check("newPassword")
+      .notEmpty()
+      .withMessage("New password is required!")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters!"),
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return res.status(400).json({ status: false, error: checkErr.errors });
+    }
+    try {
+      const { username, idcard, birthdate, newPassword } = req.body;
+      const result = await authController.resetPassword(
+        username,
+        idcard,
+        birthdate,
+        newPassword
+      );
+      return res.status(result.status ? 200 : 400).json(result);
+    } catch (error) {
+      console.error("Reset password route error:", error);
+      return res.status(500).json({
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      });
+    }
+  }
+);
+
 module.exports = router;

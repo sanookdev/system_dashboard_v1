@@ -1,8 +1,9 @@
 
-const { User, employeeAuth, SystemPermission, System, Category, LoginLog } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog, IntraPersonnel } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const md5 = require("md5");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -269,6 +270,107 @@ module.exports = {
       attributes: { exclude: ["password"] },
     });
     return user.get({ plain: true });
+  },
+
+  // Verify identity: check username + idcard + birthdate from INTRA_DB
+  async verifyIdentity(username, idcard, birthdate) {
+    try {
+      if (!username || !idcard || !birthdate) {
+        return {
+          status: false,
+          message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        };
+      }
+
+      // ตรวจสอบข้อมูลจาก INTRA_DB (appm_personnel)
+      const personnel = await IntraPersonnel.findOne({
+        where: { USERNAME: username },
+      });
+
+      if (!personnel) {
+        return {
+          status: false,
+          message: "ไม่พบข้อมูลผู้ใช้งานในระบบ",
+        };
+      }
+
+      const personnelData = personnel.get({ plain: true });
+
+      // ตรวจสอบเลขบัตรประชาชน
+      if (String(personnelData.ID_CODE).trim() !== String(idcard).trim()) {
+        return {
+          status: false,
+          message: "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
+        };
+      }
+
+      // ตรวจสอบวันเกิด — เปรียบเทียบเฉพาะส่วนวันที่ (YYYY-MM-DD)
+      const dbBirthdate = String(personnelData.BIRTH_DATE).trim().substring(0, 10);
+      const inputBirthdate = String(birthdate).trim().substring(0, 10);
+
+      if (dbBirthdate !== inputBirthdate) {
+        return {
+          status: false,
+          message: "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
+        };
+      }
+
+      return {
+        status: true,
+        message: "ยืนยันตัวตนสำเร็จ",
+      };
+    } catch (error) {
+      console.error("Verify identity error:", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      };
+    }
+  },
+
+  // Reset password: validate identity from INTRA_DB then update password in AUTH_DB
+  async resetPassword(username, idcard, birthdate, newPassword) {
+    try {
+      if (!username || !idcard || !birthdate || !newPassword) {
+        return {
+          status: false,
+          message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        };
+      }
+
+      // 1) ตรวจสอบข้อมูลจาก INTRA_DB (appm_personnel)
+      const verifyResult = await this.verifyIdentity(username, idcard, birthdate);
+      if (!verifyResult.status) {
+        return verifyResult;
+      }
+
+      // 2) Hash password ด้วย MD5(MD5(newPassword))
+      const hashedPassword = md5(md5(newPassword));
+
+      // 3) Update password ใน AUTH_DB (table user)
+      const user = await employeeAuth.findOne({ where: { username } });
+      if (!user) {
+        return {
+          status: false,
+          message: "ไม่พบบัญชีผู้ใช้งานในระบบยืนยันตัวตน",
+        };
+      }
+
+      await user.update({ password: hashedPassword });
+
+      return {
+        status: true,
+        message: "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่",
+      };
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      };
+    }
   },
 };
 
