@@ -78,6 +78,7 @@
 
           <!-- Change Password Button -->
           <button
+            v-if="user.username[0] !== 'E'"
             @click="currentView = 'changePassword'"
             class="btn border-none w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300"
           >

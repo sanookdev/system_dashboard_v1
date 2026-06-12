@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "@/utils/api";
 
 export async function fetchAvatarUrl(username) {
   try {
@@ -14,7 +15,13 @@ export async function fetchAvatarUrl(username) {
       }
     );
     console.log(data);
-    return data?.urlImg?.url ?? null;
+    const imgUrl = data?.urlImg?.url ?? null;
+    if (!imgUrl) return null;
+
+    // proxy ผ่าน backend เพื่อเลี่ยงปัญหา CORS/Private Network Access
+    return `${api.defaults.baseURL}auth/avatar-image?url=${encodeURIComponent(
+      imgUrl
+    )}`;
   } catch (e) {
     console.error("fetchAvatarUrl error:", e);
     return null;

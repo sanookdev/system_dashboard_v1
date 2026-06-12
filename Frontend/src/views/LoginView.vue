@@ -604,6 +604,92 @@
       </form>
     </dialog>
 
+    <!-- Force Change Password Modal (for external users) -->
+    <dialog ref="forceChangeModal" class="modal forgot-modal">
+      <div class="modal-box bg-white/95 backdrop-blur-md border border-white/50 shadow-2xl p-0 overflow-hidden flex flex-col forgot-modal-box">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-600 p-4 sm:p-5 text-white flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg">บังคับเปลี่ยนรหัสผ่าน</h3>
+              <p class="text-xs text-white/70">คุณต้องเปลี่ยนรหัสผ่านก่อนเข้าใช้งาน</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-6 overflow-y-auto">
+          <transition name="shake">
+            <div v-if="forceError" class="alert alert-error mb-4 shadow-sm rounded-xl text-sm font-medium text-white border-none bg-red-500/90 py-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ forceError }}</span>
+            </div>
+          </transition>
+
+          <div v-if="!forceSuccess" class="space-y-4 animate-fade-in">
+            <div class="alert bg-amber-50 text-amber-700 border-amber-200 text-sm py-3 rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>รหัสผ่านของคุณเป็นรหัสผ่านเริ่มต้น กรุณาตั้งรหัสผ่านใหม่</span>
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text font-semibold text-gray-600">รหัสผ่านใหม่</span></label>
+              <div class="input input-bordered w-full flex items-center gap-3 bg-white/70 hover:bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/50 transition-all duration-300 rounded-xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-5 h-5 opacity-50 text-amber-500">
+                  <path fill-rule="evenodd" d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z" clip-rule="evenodd" />
+                </svg>
+                <input :type="showForceNew ? 'text' : 'password'" class="grow placeholder:text-gray-400 text-gray-700" v-model="forceData.newPassword" :disabled="forceLoading" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)" />
+                <button type="button" @click="showForceNew = !showForceNew" class="btn btn-circle btn-ghost btn-xs text-gray-500 hover:text-amber-600">
+                  <svg v-if="showForceNew" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text font-semibold text-gray-600">ยืนยันรหัสผ่านใหม่</span></label>
+              <div class="input input-bordered w-full flex items-center gap-3 bg-white/70 hover:bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/50 transition-all duration-300 rounded-xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-5 h-5 opacity-50 text-amber-500">
+                  <path fill-rule="evenodd" d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z" clip-rule="evenodd" />
+                </svg>
+                <input :type="showForceConfirm ? 'text' : 'password'" class="grow placeholder:text-gray-400 text-gray-700" v-model="forceData.confirmPassword" :disabled="forceLoading" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" />
+                <button type="button" @click="showForceConfirm = !showForceConfirm" class="btn btn-circle btn-ghost btn-xs text-gray-500 hover:text-amber-600">
+                  <svg v-if="showForceConfirm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <button @click="submitForceChangePassword" :disabled="forceLoading" class="btn border-none w-full mt-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300">
+              <span v-if="!forceLoading">เปลี่ยนรหัสผ่าน</span>
+              <span v-else class="loading loading-dots loading-md"></span>
+            </button>
+          </div>
+
+          <div v-if="forceSuccess" class="text-center space-y-4 animate-fade-in py-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 text-emerald-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <h4 class="text-lg font-bold text-gray-800">เปลี่ยนรหัสผ่านสำเร็จ!</h4>
+            <p class="text-sm text-gray-500">กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่</p>
+            <button @click="closeForceChangeModal" class="btn border-none bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 transition-all duration-300 min-w-[160px]">
+              กลับไปหน้า Login
+            </button>
+          </div>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button disabled>close</button></form>
+    </dialog>
+
     <div v-if="toast.show" class="toast toast-bottom toast-center z-50">
       <div
         class="alert shadow-lg transition-all duration-300 ease-in-out transform"
@@ -772,6 +858,12 @@ const verifyIdentity = async () => {
     forgotError.value = "กรุณากรอก Username";
     return;
   }
+
+  // Block external users (E-prefix)
+  if (forgotData.username.trim().toUpperCase().startsWith("E")) {
+    forgotError.value = "ไม่สามารถใช้งานฟังก์ชันนี้ได้ โปรดติดต่อเจ้าหน้าที่เพื่อทำการ reset รหัสผ่าน";
+    return;
+  }
   if (!forgotData.idcard.trim() || forgotData.idcard.trim().length !== 13) {
     forgotError.value = "กรุณากรอกเลขบัตรประชาชน 13 หลัก";
     return;
@@ -867,6 +959,86 @@ const submitResetPassword = async () => {
 };
 // ========== (END) Forgot Password ==========
 
+// ========== Force Change Password (External) ==========
+const forceChangeModal = ref(null);
+const forceLoading = ref(false);
+const forceError = ref("");
+const forceSuccess = ref(false);
+const forceChangeUsername = ref("");
+const showForceNew = ref(false);
+const showForceConfirm = ref(false);
+
+const forceData = reactive({
+  newPassword: "",
+  confirmPassword: "",
+});
+
+const openForceChangeModal = () => {
+  forceError.value = "";
+  forceSuccess.value = false;
+  forceLoading.value = false;
+  forceData.newPassword = "";
+  forceData.confirmPassword = "";
+  showForceNew.value = false;
+  showForceConfirm.value = false;
+  if (forceChangeModal.value) {
+    forceChangeModal.value.showModal();
+  }
+};
+
+const closeForceChangeModal = () => {
+  if (forceChangeModal.value) {
+    forceChangeModal.value.close();
+  }
+};
+
+const submitForceChangePassword = async () => {
+  forceError.value = "";
+
+  if (!forceData.newPassword || forceData.newPassword.length < 6) {
+    forceError.value = "รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร";
+    return;
+  }
+  if (forceData.newPassword === "123456") {
+    forceError.value = "ไม่สามารถใช้รหัสผ่าน 123456 ได้";
+    return;
+  }
+  if (forceData.newPassword !== forceData.confirmPassword) {
+    forceError.value = "รหัสผ่านใหม่ไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง";
+    return;
+  }
+
+  forceLoading.value = true;
+
+  try {
+    const res = await axios.post(
+      `${baseApiUrl}auth/external-change-password`,
+      {
+        username: forceChangeUsername.value,
+        oldPassword: "123456",
+        newPassword: forceData.newPassword,
+      },
+      {
+        headers: {
+          "application-key": import.meta.env.VITE_APPLICATION_KEY,
+        },
+      }
+    );
+
+    if (res.data && res.data.status) {
+      forceSuccess.value = true;
+    } else {
+      forceError.value = res.data?.message || "เกิดข้อผิดพลาด กรุณาลองใหม่";
+    }
+  } catch (error) {
+    console.error("Force change password error:", error);
+    forceError.value = error.response?.data?.message || "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
+  } finally {
+    forceLoading.value = false;
+  }
+};
+// ========== (END) Force Change Password ==========
+
 const login = async () => {
   loading.value = true;
   loginError.value = "";
@@ -883,6 +1055,15 @@ const login = async () => {
   console.log(accountStore.user);
 
   if (accountStore.response.status) {
+    // เช็ค force_change_password สำหรับ external user
+    if (accountStore.response.force_change_password) {
+      // Logout ก่อน เพราะยังไม่ควรให้เข้าระบบ
+      forceChangeUsername.value = accountStore.user?.username || userLoginData.username;
+      accountStore.logout();
+      openForceChangeModal();
+      return;
+    }
+
     // ✅ 4. กรณี Login สำเร็จ: แสดง Toast ก่อนย้ายหน้า
     showToast("เข้าสู่ระบบสำเร็จ...", "success");
     setTimeout(() => {

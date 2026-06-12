@@ -39,6 +39,13 @@ const intraDB = new Sequelize(
   { host: process.env.INTRA_DB_HOST, port: process.env.INTRA_DB_PORT || 3306, ...commonOptions }
 );
 
+const intraMenuHandleDB = new Sequelize(
+  'menu_handle',
+  process.env.INTRA_DB_USER,
+  process.env.INTRA_DB_PASS,
+  { host: process.env.INTRA_DB_HOST, port: process.env.INTRA_DB_PORT || 3306, ...commonOptions }
+);
+
 const db = {};
 db.Sequelize = Sequelize;
 
@@ -62,6 +69,18 @@ db.System.hasMany(db.SystemPermission, {
 
 db.User = require("./user.model")(sequelize, DataTypes);
 db.ExternalUser = require("./external_user.model")(sequelize, DataTypes);
+db.ExternalDepartment = require("./superadmin/external_department.model")(sequelize, DataTypes);
+
+// ExternalDepartment <-> ExternalUser associations
+db.ExternalDepartment.hasMany(db.ExternalUser, {
+  foreignKey: "department_id",
+  as: "users",
+});
+db.ExternalUser.belongsTo(db.ExternalDepartment, {
+  foreignKey: "department_id",
+  as: "department",
+});
+
 db.Category = require("./superadmin/category.model")(sequelize, DataTypes);
 
 db.Category.hasMany(db.System, {
@@ -101,6 +120,32 @@ db.ChangePasswordLog = require("./change_password_log.model")(userDB, DataTypes)
 // INTRA DB
 db.intraDB = intraDB;
 db.IntraPersonnel = require("./intra_personnel.model")(intraDB, DataTypes);
+db.IntraAuthorise = require("./intra_authorise.model")(intraMenuHandleDB, DataTypes);
 // (END) INTRA DB
 
+// Auto-sync new tables & seed departments
+(async () => {
+  try {
+    await db.ExternalDepartment.sync({ alter: true });
+    await db.ExternalUser.sync({ alter: true });
+
+    // Seed default departments if table is empty
+    const count = await db.ExternalDepartment.count();
+    if (count === 0) {
+      await db.ExternalDepartment.bulkCreate([
+        { name: "กลุ่มงานอายุรกรรม", code: "IM" },
+        { name: "กลุ่มงานศัลยกรรม", code: "SU" },
+        { name: "กลุ่มงานกุมารเวชกรรม", code: "PE" },
+        { name: "กลุ่มงานสูติ-นรีเวชกรรม", code: "OB" },
+        { name: "กลุ่มงานออร์โธ", code: "OT" },
+        { name: "กลุ่มงานเวชศาสตร์ฉุกเฉิน", code: "EM" },
+      ]);
+      console.log("✅ Seeded default external departments");
+    }
+  } catch (err) {
+    console.error("Auto-sync error:", err.message);
+  }
+})();
+
 module.exports = db;
+

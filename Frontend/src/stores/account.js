@@ -52,6 +52,7 @@ export const useAccountStore = defineStore("account", {
 
           this.response.status = true;
           this.response.message = res.data.message;
+          this.response.force_change_password = !!res.data.force_change_password;
         } else {
           // กรณี login ไม่สำเร็จ
           this.response.status = false;

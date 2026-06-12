@@ -4,10 +4,58 @@
       <span class="loading loading-dots"></span>
     </div>
     <div v-else>
+      <!-- Department Management Section -->
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300 mb-6">
+        <input type="checkbox" />
+        <div class="collapse-title font-bold text-lg">
+          จัดการหน่วยงานภายนอก
+        </div>
+        <div class="collapse-content">
+          <form @submit.prevent="onSubmitDept" class="flex gap-2 items-end flex-wrap mb-4">
+            <div>
+              <label class="label"><span class="label-text">ชื่อหน่วยงาน</span></label>
+              <input v-model="deptForm.name" type="text" placeholder="กลุ่มงาน..." class="input input-bordered input-sm w-64" />
+            </div>
+            <div>
+              <label class="label"><span class="label-text">รหัส (Code)</span></label>
+              <input v-model="deptForm.code" type="text" placeholder="IM" class="input input-bordered input-sm w-24" maxlength="10" />
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-success btn-sm">{{ isEditDept ? 'อัพเดต' : 'สร้าง' }}</button>
+              <a v-if="isEditDept" @click="clearDeptForm" class="btn btn-ghost btn-sm">ยกเลิก</a>
+            </div>
+          </form>
+
+          <div v-if="departments.length" class="overflow-x-auto">
+            <table class="table table-sm table-zebra">
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>ชื่อหน่วยงาน</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="dept in departments" :key="dept.id">
+                  <td>{{ dept.code }}</td>
+                  <td>{{ dept.name }}</td>
+                  <td class="flex gap-1">
+                    <button @click="onEditDept(dept)" class="btn btn-xs btn-info">แก้ไข</button>
+                    <button @click="onDeleteDept(dept)" class="btn btn-xs btn-error">ลบ</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else class="text-sm text-gray-500">ไม่มีข้อมูลหน่วยงาน</div>
+        </div>
+      </div>
+
+      <!-- Create/Edit User Form -->
       <div class="mb-4">
         <div class="flex flex-col gap-2">
           <form @submit.prevent="onSubmit" class="flex gap-2 items-end flex-wrap">
-            <div class="flex flex-col gap-2 md:flex-row items-end">
+            <div class="flex flex-col gap-2 md:flex-row items-end flex-wrap">
               <div>
                 <label class="label"><span class="label-text">Username (ขึ้นต้นด้วย EXT-)</span></label>
                 <input
@@ -46,6 +94,24 @@
                 />
               </div>
               <div>
+                <label class="label"><span class="label-text">Email</span></label>
+                <input
+                  v-model="form.email"
+                  type="email"
+                  placeholder="example@email.com"
+                  class="input input-bordered w-full"
+                />
+              </div>
+              <div>
+                <label class="label"><span class="label-text">หน่วยงาน</span></label>
+                <select class="select select-bordered" v-model="form.department_id">
+                  <option :value="null">-- ไม่ระบุ --</option>
+                  <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                    {{ dept.name }} ({{ dept.code }})
+                  </option>
+                </select>
+              </div>
+              <div>
                 <label class="label"><span class="label-text">สถานะ</span></label>
                 <select class="select select-bordered" v-model="form.is_active">
                   <option :value="true">Active</option>
@@ -64,6 +130,7 @@
           </form>
         </div>
         
+        <!-- Import Section -->
         <div class="flex flex-col gap-2 mt-4 p-4 border rounded bg-base-100">
           <h3 class="font-bold">นำเข้าข้อมูลผ่าน Excel</h3>
           <div class="flex gap-4 items-center flex-wrap">
@@ -116,17 +183,20 @@
         </div>
       </div>
 
+      <!-- Users Table -->
       <div v-if="users.length">
         <Table
           :headers="[
             'username',
             'fname',
             'lname',
+            'email',
+            'department_name',
             'is_active',
             'created_at',
             'updated_at',
           ]"
-          :rows="users"
+          :rows="usersWithDeptName"
           :edit_button="true"
           :delete_button="true"
           :view_button="false"
@@ -144,6 +214,7 @@ import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import { useExternalUsersStore } from "@/stores/superadmin/external_users";
+import { useExternalDepartmentsStore } from "@/stores/superadmin/external_departments";
 import Table from "@/components/Table.vue";
 import * as XLSX from "xlsx";
 
@@ -152,9 +223,19 @@ const router = useRouter();
 
 const loading = ref(false);
 const usersStore = useExternalUsersStore();
+const deptStore = useExternalDepartmentsStore();
 const users = computed(() => usersStore.list);
+const departments = computed(() => deptStore.list);
 
-const form = ref({ username: "", password: "", fname: "", lname: "", is_active: true });
+// Map department name into user rows for table display
+const usersWithDeptName = computed(() => {
+  return users.value.map(u => ({
+    ...u,
+    department_name: u.department ? `${u.department.name} (${u.department.code})` : '-',
+  }));
+});
+
+const form = ref({ username: "", password: "", fname: "", lname: "", email: "", department_id: null, is_active: true });
 const resetPasswordVal = ref("");
 const isEditMode = ref(false);
 
@@ -162,9 +243,17 @@ const selectedFile = ref(null);
 const fileInput = ref(null);
 const importResult = ref(null);
 
+// Department form
+const deptForm = ref({ name: "", code: "" });
+const isEditDept = ref(false);
+const editDeptId = ref(null);
+
 onMounted(async () => {
   loading.value = true;
-  await usersStore.getExternalUsers();
+  await Promise.all([
+    usersStore.getExternalUsers(),
+    deptStore.getDepartments(),
+  ]);
   loading.value = false;
 
   if (usersStore.response.statusCode === 403) {
@@ -177,11 +266,53 @@ onMounted(async () => {
   }
 });
 
+// ===== Department CRUD =====
+const onSubmitDept = async () => {
+  if (!deptForm.value.name.trim() || !deptForm.value.code.trim()) {
+    proxy.$alertify.alert("กรุณาระบุชื่อและรหัสหน่วยงาน");
+    return;
+  }
+
+  let result;
+  if (isEditDept.value) {
+    result = await deptStore.updateDepartment(editDeptId.value, deptForm.value);
+  } else {
+    result = await deptStore.createDepartment(deptForm.value);
+  }
+
+  proxy.$alertify.alert(result.message).set({ title: result.status ? "สำเร็จ" : "ข้อผิดพลาด" });
+  if (result.status) clearDeptForm();
+};
+
+const onEditDept = (dept) => {
+  deptForm.value = { name: dept.name, code: dept.code };
+  editDeptId.value = dept.id;
+  isEditDept.value = true;
+};
+
+const onDeleteDept = async (dept) => {
+  proxy.$alertify
+    .confirm(`ลบหน่วยงาน "${dept.name}" ใช่หรือไม่?`, async () => {
+      const result = await deptStore.deleteDepartment(dept.id);
+      proxy.$alertify.alert(result.message).set({ title: result.status ? "สำเร็จ" : "ผิดพลาด" });
+    })
+    .set({ title: "ยืนยันการลบ" });
+};
+
+const clearDeptForm = () => {
+  deptForm.value = { name: "", code: "" };
+  isEditDept.value = false;
+  editDeptId.value = null;
+};
+
+// ===== User CRUD =====
 const onEdit = (row) => {
   form.value = { 
     username: row.username, 
     fname: row.fname || "", 
     lname: row.lname || "", 
+    email: row.email || "",
+    department_id: row.department_id || null,
     is_active: row.is_active 
   };
   resetPasswordVal.value = "";
@@ -231,6 +362,8 @@ const onSubmit = async () => {
     result = await usersStore.updateExternalUser(form.value.username, {
       fname: form.value.fname,
       lname: form.value.lname,
+      email: form.value.email,
+      department_id: form.value.department_id,
       is_active: form.value.is_active,
     });
   } else {
@@ -239,6 +372,8 @@ const onSubmit = async () => {
       password: form.value.password,
       fname: form.value.fname,
       lname: form.value.lname,
+      email: form.value.email,
+      department_id: form.value.department_id,
       is_active: form.value.is_active,
     });
   }
@@ -253,14 +388,14 @@ const onSubmit = async () => {
 };
 
 const clearForm = () => {
-  form.value = { username: "", password: "", fname: "", lname: "", is_active: true };
+  form.value = { username: "", password: "", fname: "", lname: "", email: "", department_id: null, is_active: true };
   resetPasswordVal.value = "";
   isEditMode.value = false;
 };
 
 const downloadTemplate = () => {
   const ws = XLSX.utils.json_to_sheet([
-    { username: "EXT-001", password: "password123", fname: "ชื่อ", lname: "นามสกุล" }
+    { username: "EXT-001", password: "123456", fname: "ชื่อ", lname: "นามสกุล", email: "example@email.com", department_code: "IM" }
   ]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Template");

@@ -1,5 +1,5 @@
 
-const { User, employeeAuth, SystemPermission, System, Category, LoginLog, IntraPersonnel, ChangePasswordLog } = require("../models");
+const { User, employeeAuth, SystemPermission, System, Category, LoginLog, IntraPersonnel, ChangePasswordLog, IntraAuthorise } = require("../models");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -144,7 +144,7 @@ module.exports = {
           message: "กรุณาระบุ username และ password",
         };
       }
-      let user = await employeeAuth.findOne({ where: { username } });
+      let user = await employeeAuth.findOne({ where: { username, auth_status: 1 } });
       let isExternal = false;
       let passwordMatched = false;
 
@@ -182,6 +182,13 @@ module.exports = {
 
       await recordLoginLog(user.username);
 
+      // ✅ เช็คว่า external user ใช้ default password (123456) หรือไม่
+      let forceChangePassword = false;
+      if (isExternal) {
+        const bcryptCheck = require("bcrypt");
+        forceChangePassword = await bcryptCheck.compare("123456", user.password);
+      }
+
       // ✅ สร้าง token
       const token = jwt.sign(
         {
@@ -199,9 +206,10 @@ module.exports = {
       delete userPlain.password;
       return {
         status: true,
-        message: "เข้าสู่ระบบสำเร็จ",
+        message: forceChangePassword ? "กรุณาเปลี่ยนรหัสผ่าน" : "เข้าสู่ระบบสำเร็จ",
         user: userPlain,
         token,
+        force_change_password: forceChangePassword,
       };
     } catch (error) {
       console.error("Login error:", error);
@@ -359,7 +367,22 @@ module.exports = {
 
       await user.update({ password: hashedPassword });
 
-      // 4) บันทึก log การเปลี่ยน password ใน AUTH_DB
+      // 4) Sync password ไปยัง INTRA_DB (menu_handle.authorise)
+      try {
+        const [affectedRows] = await IntraAuthorise.update(
+          { authorise_pass: newPassword },
+          { where: { medcode: username } }
+        );
+        if (affectedRows > 0) {
+          console.log(`✅ Synced password to menu_handle.authorise for medcode=${username}`);
+        } else {
+          console.log(`ℹ️ No matching medcode=${username} in menu_handle.authorise`);
+        }
+      } catch (syncError) {
+        console.error("Sync to menu_handle.authorise error (non-blocking):", syncError.message);
+      }
+
+      // 5) บันทึก log การเปลี่ยน password ใน AUTH_DB
       try {
         await ChangePasswordLog.create({
           username: username,
@@ -419,7 +442,22 @@ module.exports = {
       // 4) Update password
       await user.update({ password: hashedNewPassword });
 
-      // 5) บันทึก log
+      // 5) Sync password ไปยัง INTRA_DB (menu_handle.authorise)
+      try {
+        const [affectedRows] = await IntraAuthorise.update(
+          { authorise_pass: newPassword },
+          { where: { medcode: username } }
+        );
+        if (affectedRows > 0) {
+          console.log(`✅ Synced password to menu_handle.authorise for medcode=${username}`);
+        } else {
+          console.log(`ℹ️ No matching medcode=${username} in menu_handle.authorise`);
+        }
+      } catch (syncError) {
+        console.error("Sync to menu_handle.authorise error (non-blocking):", syncError.message);
+      }
+
+      // 6) บันทึก log
       try {
         await ChangePasswordLog.create({
           username: username,
@@ -437,6 +475,54 @@ module.exports = {
       };
     } catch (error) {
       console.error("Change password error:", error);
+      return {
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      };
+    }
+  },
+
+  // Change password for external users (system_dashboard.external_users)
+  async externalChangePassword(username, oldPassword, newPassword) {
+    try {
+      if (!username || !oldPassword || !newPassword) {
+        return {
+          status: false,
+          message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        };
+      }
+
+      const { ExternalUser } = require("../models");
+      const user = await ExternalUser.findOne({ where: { username } });
+      if (!user) {
+        return {
+          status: false,
+          message: "ไม่พบบัญชีผู้ใช้งาน",
+        };
+      }
+
+      // ตรวจสอบ old password (bcrypt)
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return {
+          status: false,
+          message: "รหัสผ่านเดิมไม่ถูกต้อง",
+        };
+      }
+
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password in system_dashboard.external_users
+      await user.update({ password: hashedNewPassword });
+
+      return {
+        status: true,
+        message: "เปลี่ยนรหัสผ่านสำเร็จ",
+      };
+    } catch (error) {
+      console.error("External change password error:", error);
       return {
         status: false,
         message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",

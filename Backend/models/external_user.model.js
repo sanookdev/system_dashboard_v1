@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       password: { type: DataTypes.STRING, allowNull: false },
       fname: { type: DataTypes.STRING },
       lname: { type: DataTypes.STRING },
+      email: { type: DataTypes.STRING },
+      department_id: { type: DataTypes.INTEGER },
       is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
     },
     {

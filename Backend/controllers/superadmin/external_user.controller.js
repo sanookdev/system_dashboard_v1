@@ -1,4 +1,4 @@
-const { ExternalUser, employeeAuth } = require("../../models");
+const { ExternalUser, ExternalDepartment, employeeAuth } = require("../../models");
 const bcrypt = require("bcrypt");
 
 module.exports = {
@@ -6,6 +6,13 @@ module.exports = {
     try {
       const users = await ExternalUser.findAll({
         attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: ExternalDepartment,
+            as: "department",
+            attributes: ["id", "name", "code"],
+          },
+        ],
         order: [["created_at", "DESC"]],
       });
       return res.status(200).json({ status: true, data: users });
@@ -16,7 +23,7 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const { username, password, fname, lname, is_active } = req.body;
+      const { username, password, fname, lname, email, department_id, is_active } = req.body;
       if (!username || !password) {
         return res.status(400).json({ status: false, message: "Username and password are required" });
       }
@@ -41,6 +48,8 @@ module.exports = {
         password: hashedPassword,
         fname: fname ? String(fname).trim() : null,
         lname: lname ? String(lname).trim() : null,
+        email: email ? String(email).trim() : null,
+        department_id: department_id || null,
         is_active: is_active !== undefined ? is_active : true,
       });
 
@@ -56,14 +65,20 @@ module.exports = {
   async update(req, res) {
     try {
       const { username } = req.params;
-      const { fname, lname, is_active } = req.body;
+      const { fname, lname, email, department_id, is_active } = req.body;
 
       const user = await ExternalUser.findOne({ where: { username } });
       if (!user) {
         return res.status(404).json({ status: false, message: "User not found" });
       }
 
-      await user.update({ fname, lname, is_active });
+      await user.update({
+        fname,
+        lname,
+        email: email !== undefined ? email : user.email,
+        department_id: department_id !== undefined ? department_id : user.department_id,
+        is_active,
+      });
 
       const userPlain = user.get({ plain: true });
       delete userPlain.password;
@@ -119,11 +134,18 @@ module.exports = {
         return res.status(400).json({ status: false, message: "Invalid data format" });
       }
 
+      // Pre-load departments for code mapping
+      const departments = await ExternalDepartment.findAll();
+      const deptCodeMap = {};
+      departments.forEach((d) => {
+        deptCodeMap[d.code.toUpperCase()] = d.id;
+      });
+
       let successList = [];
       let failedList = [];
 
       for (const userData of users) {
-        const { username, password, fname, lname } = userData;
+        const { username, password, fname, lname, email, department_code } = userData;
         if (!username || !password) {
           failedList.push({ username: username || "ไม่ระบุ", reason: "ข้อมูลไม่ครบถ้วน (ต้องการ username และ password)" });
           continue;
@@ -144,12 +166,26 @@ module.exports = {
           continue;
         }
 
+        // Map department_code to department_id
+        let departmentId = null;
+        if (department_code) {
+          const code = String(department_code).trim().toUpperCase();
+          if (deptCodeMap[code]) {
+            departmentId = deptCodeMap[code];
+          } else {
+            failedList.push({ username: cleanUsername, reason: `ไม่พบรหัสหน่วยงาน: ${department_code}` });
+            continue;
+          }
+        }
+
         const hashedPassword = await bcrypt.hash(cleanPassword, 10);
         await ExternalUser.create({
           username: cleanUsername,
           password: hashedPassword,
           fname: fname ? String(fname).trim() : null,
           lname: lname ? String(lname).trim() : null,
+          email: email ? String(email).trim() : null,
+          department_id: departmentId,
           is_active: true,
         });
         successList.push({ username: cleanUsername });

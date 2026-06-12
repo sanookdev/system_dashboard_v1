@@ -423,6 +423,46 @@ router.post(
   }
 );
 
+/* ---------- GET /auth/avatar-image?url=... ----------
+   Proxy รูปภาพจากเครือข่ายภายใน (เช่น eservice.med.tu.ac.th) ให้ frontend
+   เพราะ browser ฝั่ง client บล็อกการเรียกตรงด้วย Private Network Access (CORS)
+------------------------------------------------ */
+const ALLOWED_AVATAR_HOSTS = ["eservice.med.tu.ac.th", "med.tu.ac.th"];
+
+router.get("/avatar-image", async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return badRequest(res, "url is required");
+
+    let target;
+    try {
+      target = new URL(url);
+    } catch {
+      return badRequest(res, "invalid url");
+    }
+
+    if (!ALLOWED_AVATAR_HOSTS.includes(target.hostname)) {
+      return forbidden(res, "host not allowed");
+    }
+
+    const upstream = await fetch(target.toString());
+    if (!upstream.ok) {
+      return res.status(upstream.status).end();
+    }
+
+    res.setHeader(
+      "Content-Type",
+      upstream.headers.get("content-type") || "image/png"
+    );
+    res.setHeader("Cache-Control", "public, max-age=3600");
+
+    const buffer = Buffer.from(await upstream.arrayBuffer());
+    return res.send(buffer);
+  } catch (error) {
+    return serverError(res, error);
+  }
+});
+
 router.get("/genkey", async (req, res) => {
   try {
     const appkey = await security.encryptKey();
@@ -472,6 +512,15 @@ router.post(
     }
     try {
       const { username, idcard, birthdate } = req.body;
+
+      // Block external users (E-prefix)
+      if (username && String(username).trim().toUpperCase().startsWith("E")) {
+        return res.status(400).json({
+          status: false,
+          message: "ไม่สามารถใช้งานฟังก์ชันนี้ได้ โปรดติดต่อเจ้าหน้าที่เพื่อทำการ reset รหัสผ่าน",
+        });
+      }
+
       const result = await authController.verifyIdentity(
         username,
         idcard,
@@ -509,6 +558,15 @@ router.post(
     }
     try {
       const { username, idcard, birthdate, newPassword } = req.body;
+
+      // Block external users (E-prefix)
+      if (username && String(username).trim().toUpperCase().startsWith("E")) {
+        return res.status(400).json({
+          status: false,
+          message: "ไม่สามารถใช้งานฟังก์ชันนี้ได้ โปรดติดต่อเจ้าหน้าที่เพื่อทำการ reset รหัสผ่าน",
+        });
+      }
+
       const result = await authController.resetPassword(
         username,
         idcard,
@@ -555,6 +613,42 @@ router.post(
       return res.status(result.status ? 200 : 400).json(result);
     } catch (error) {
       console.error("Change password route error:", error);
+      return res.status(500).json({
+        status: false,
+        message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        error: error.message,
+      });
+    }
+  }
+);
+
+router.post(
+  "/external-change-password",
+  verifyApplicationKey,
+  [
+    check("username").notEmpty().withMessage("Username is required!"),
+    check("oldPassword").notEmpty().withMessage("Old password is required!"),
+    check("newPassword")
+      .notEmpty()
+      .withMessage("New password is required!")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters!"),
+  ],
+  async (req, res) => {
+    const checkErr = validationResult(req);
+    if (!checkErr.isEmpty()) {
+      return res.status(400).json({ status: false, error: checkErr.errors });
+    }
+    try {
+      const { username, oldPassword, newPassword } = req.body;
+      const result = await authController.externalChangePassword(
+        username,
+        oldPassword,
+        newPassword
+      );
+      return res.status(result.status ? 200 : 400).json(result);
+    } catch (error) {
+      console.error("External change password route error:", error);
       return res.status(500).json({
         status: false,
         message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
