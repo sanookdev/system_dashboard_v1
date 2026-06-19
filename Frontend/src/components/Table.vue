@@ -70,7 +70,9 @@
       </tbody>
     </table>
 
-    <!-- Pagination -->
+    
+  </div>
+  <!-- Pagination -->
     <div class="mt-4 flex justify-between items-center text-sm">
       <div>
         Showing {{ startItem }}–{{ endItem }} of {{ rows.length }} entries
@@ -101,7 +103,6 @@
         </button>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>

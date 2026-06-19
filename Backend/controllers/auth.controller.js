@@ -38,6 +38,7 @@ module.exports = {
         order: [
           ["lastlogin_at", "DESC"],
         ],
+        limit: 100
       });
       return {
         status: true,
